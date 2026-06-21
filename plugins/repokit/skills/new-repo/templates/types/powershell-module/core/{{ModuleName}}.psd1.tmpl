@@ -1,0 +1,24 @@
+@{
+    RootModule        = '{{ModuleName}}.psm1'
+    ModuleVersion     = '0.1.0'  # x-release-please-version
+    GUID              = '{{Guid}}'
+    Author            = '{{author}}'
+    Description       = '{{description}}'
+    PowerShellVersion = '5.1'
+
+    # List the Public/ functions you want exported (explicit — no wildcards).
+    FunctionsToExport = @()
+    CmdletsToExport   = @()
+    VariablesToExport = @()
+    AliasesToExport   = @()
+
+    PrivateData = @{
+        PSData = @{
+            # Fill these before publishing to the PowerShell Gallery.
+            Tags         = @()
+            LicenseUri   = ''
+            ProjectUri   = ''
+            ReleaseNotes = ''
+        }
+    }
+}

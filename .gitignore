@@ -1,0 +1,16 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Python (validation scripts)
+__pycache__/
+*.pyc
+.venv/
+
+# Build / release artifacts
+release-assets/
+*.nupkg
+node_modules/

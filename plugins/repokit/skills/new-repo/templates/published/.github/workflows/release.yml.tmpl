@@ -1,0 +1,23 @@
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      # Opens / updates a release PR from your Conventional Commits. Merging it
+      # bumps the version, updates CHANGELOG.md, tags, and creates a GitHub release.
+      # (Releases created by the default token don't trigger other workflows; if you
+      # need the publish workflow to fire on release, supply a PAT via `token:`.)
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

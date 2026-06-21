@@ -1,0 +1,32 @@
+# {{ModuleName}}
+
+{{description}}
+
+## Install
+
+```powershell
+Install-PSResource {{ModuleName}}   # from the PowerShell Gallery (once published)
+```
+
+## How to ship a change
+
+```mermaid
+flowchart LR
+    Edit["Edit a function in Public/"] --> Test["Run Pester tests locally"]
+    Test --> Commit["Conventional commit + push"]
+    Commit --> CI["CI: PSScriptAnalyzer + Pester"]
+    CI -->|green| Merge["Merge to main"]
+    Merge --> RP["release-please opens a release PR<br/>(bumps ModuleVersion in the .psd1)"]
+    RP -->|you approve| Tag["Tag + GitHub release"]
+    Tag --> Pub["Publish-PSResource to PSGallery<br/>(gated approval — you click go)"]
+```
+
+## Layout
+
+- `Public/` — exported functions (one per file; the file's base name is the function name).
+- `Private/` — internal helpers (not exported).
+- `Tests/` — Pester tests.
+- `{{ModuleName}}.psd1` — the module manifest; `{{ModuleName}}.psm1` dot-sources `Public/` + `Private/`.
+
+See [`AGENTS.md`](AGENTS.md) for the START-HERE map. Follows the
+[RepoKit](https://github.com/PBNZ/repo-kit) standard.

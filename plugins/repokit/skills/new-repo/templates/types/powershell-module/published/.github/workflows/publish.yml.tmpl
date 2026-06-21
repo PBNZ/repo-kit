@@ -1,0 +1,30 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to the PowerShell Gallery
+    runs-on: ubuntu-latest
+    # Gated: requires your approval. Create an Environment named "psgallery"
+    # with the PSGALLERY_API_KEY secret and a required reviewer (you).
+    environment: psgallery
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish module
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          # Dry-run first, then the real publish. The module manifest is at the repo root.
+          Publish-PSResource -Path . -Repository PSGallery -ApiKey $env:PSGALLERY_API_KEY -WhatIf
+          Publish-PSResource -Path . -Repository PSGallery -ApiKey $env:PSGALLERY_API_KEY

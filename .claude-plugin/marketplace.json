@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "repo-kit",
+  "description": "RepoKit — a reusable repo standard + /new-repo scaffolder. Stamp consistent, navigable repos from commit #1.",
+  "owner": {
+    "name": "PBNZ"
+  },
+  "plugins": [
+    {
+      "name": "repokit",
+      "source": "./plugins/repokit",
+      "description": "Scaffold standard-compliant repos (/new-repo) and apply the repo standard while you work.",
+      "version": "0.1.0"
+    }
+  ]
+}

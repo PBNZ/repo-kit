@@ -1,0 +1,14 @@
+# Pester tests for {{ModuleName}}.
+
+BeforeAll {
+    $ModuleRoot = Split-Path -Parent $PSScriptRoot
+    $Manifest   = Join-Path $ModuleRoot '{{ModuleName}}.psd1'
+}
+
+Describe '{{ModuleName}} module manifest' {
+    It 'passes Test-ModuleManifest' {
+        Test-ModuleManifest -Path $Manifest | Should -Not -BeNullOrEmpty
+    }
+}
+
+# Add a Describe block per exported function as you build {{ModuleName}} out.
