@@ -12,6 +12,9 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
 
 - `standard/the-standard.md` — the type × tier model, per-tier file lists, the where-things-live
   map, the promotion path, and the do/don't list.
+- `standard/where-things-go.md` — a placement guide: "I have X — where does it go, how do I create
+  the place if it doesn't exist yet, and on what convention?" Use this for any "where does this go"
+  question.
 - `standard/commit-conventions.md` — Conventional Commits, SemVer, Keep a Changelog, and how
   release-please fits in at the Published tier.
 - `standard/pre-commit-checklist.md` — run through this before every commit.
@@ -25,6 +28,10 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
 - **Read the START-HERE map in `AGENTS.md` first.** It tells you where rules, decisions,
   checklists, CI, and tests live in *this* repo.
 - **Record notable decisions as ADRs** in `docs/adr/` (copy `0000-template.md`).
+- **"Where does X go?"** — consult `standard/where-things-go.md`. Give the location, how to create
+  the place if it doesn't exist yet, and the convention it's based on (name the source). If the
+  thing isn't listed, apply the rule of thumb there, say where your suggestion comes from, and
+  offer to add a row (or write an ADR) so it's captured.
 - **Conventional Commits**, one concern per PR. Update `CHANGELOG.md` under `## [Unreleased]` for
   user-visible changes.
 - **Ceremony scales by visibility** (Core → +Public → +Published). Don't add public/published

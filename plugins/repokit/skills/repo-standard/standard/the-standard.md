@@ -68,6 +68,9 @@ No governance overhead. A forever-private repo stays here and stays effortless.
 - **CI / release / publish** → `.github/workflows/`.
 - **Tests** → the type's test dir (e.g. `Tests/` for a PowerShell module).
 
+For a fuller "I have X — where does it go, and how do I create the place if it's missing" guide,
+see [`where-things-go.md`](where-things-go.md).
+
 ### Growing the `docs/` folder
 
 Core ships only `docs/adr/`. Add more under the same `docs/` umbrella **as you need it** — don't
