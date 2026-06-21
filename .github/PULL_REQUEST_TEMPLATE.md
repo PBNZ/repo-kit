@@ -8,4 +8,4 @@
 - [ ] Conventional Commit title (e.g. `feat: …`, `fix: …`, `docs: …`).
 - [ ] `CHANGELOG.md` updated under `## [Unreleased]` if user-visible.
 - [ ] Validation passes locally (`python scripts/*.py`; see `.github/workflows/validate.yml`).
-- [ ] An ADR added under `doc/adr/` for any notable decision.
+- [ ] An ADR added under `docs/adr/` for any notable decision.

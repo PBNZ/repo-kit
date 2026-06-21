@@ -24,7 +24,7 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
   a plugin-root `CLAUDE.md` — it isn't loaded as context.
 - **Read the START-HERE map in `AGENTS.md` first.** It tells you where rules, decisions,
   checklists, CI, and tests live in *this* repo.
-- **Record notable decisions as ADRs** in `doc/adr/` (copy `0000-template.md`).
+- **Record notable decisions as ADRs** in `docs/adr/` (copy `0000-template.md`).
 - **Conventional Commits**, one concern per PR. Update `CHANGELOG.md` under `## [Unreleased]` for
   user-visible changes.
 - **Ceremony scales by visibility** (Core → +Public → +Published). Don't add public/published

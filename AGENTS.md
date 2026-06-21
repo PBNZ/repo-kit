@@ -17,7 +17,7 @@ This repo **dogfoods its own standard** (Core + Public tier).
 | What to test per repo type | `plugins/repokit/skills/repo-standard/standard/testing-matrix.md` |
 | The scaffolding methodology (`/new-repo`) | `plugins/repokit/skills/new-repo/SKILL.md` |
 | Templates stamped into new repos | `plugins/repokit/skills/new-repo/templates/` |
-| Decisions & rationale (learnings log) | `doc/adr/` |
+| Decisions & rationale (learnings log) | `docs/adr/` |
 | Validation scripts (run before committing) | `scripts/` + `.github/workflows/validate.yml` |
 
 ## Ground rules
@@ -30,4 +30,4 @@ This repo **dogfoods its own standard** (Core + Public tier).
 - Templates and `SKILL.md` files are **prompt content** — keep them plain prose, no secrets, no
   email addresses (CI enforces this via `scripts/check_*.py`).
 - RepoKit publishes to its own marketplace; "publish" = bump versions in `plugin.json` /
-  `marketplace.json` / `CHANGELOG.md`, then tag and push. See `doc/adr/0001-repokit-architecture.md`.
+  `marketplace.json` / `CHANGELOG.md`, then tag and push. See `docs/adr/0001-repokit-architecture.md`.

@@ -50,14 +50,14 @@ want to continue.
 2. **Stamp each file.** For each pair: read the template from `<base>/templates/…`, replace every
    placeholder (see `references/placeholders.md`), and write it to the target path under the new
    repo directory. Files with no `.tmpl` suffix are copied verbatim. Create directories as needed
-   (`doc/adr/`, `.github/…`, any type-specific dirs).
+   (`docs/adr/`, `.github/…`, any type-specific dirs).
 
-3. **Write `doc/adr/0001-initial-decisions.md`** from the `doc/adr/0000-template.md` you just
+3. **Write `docs/adr/0001-initial-decisions.md`** from the `docs/adr/0000-template.md` you just
    stamped, recording the name, type, visibility/tier, licence, author, and any notable interview
    choices.
 
 4. **Generate the START-HERE map.** From the resolved file set, build a short "where things live"
-   table (rules → `AGENTS.md`; decisions → `doc/adr/`; conventions & checklists → the
+   table (rules → `AGENTS.md`; decisions → `docs/adr/`; conventions & checklists → the
    `repo-standard` skill; CI → `.github/workflows/`; tests → the type's test dir) and substitute it
    into the `{{START_HERE_MAP}}` placeholder in the stamped `AGENTS.md`. Add a one-line pointer in
    the README.

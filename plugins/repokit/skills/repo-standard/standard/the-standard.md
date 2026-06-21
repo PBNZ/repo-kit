@@ -27,7 +27,8 @@ flowchart TD
 
 - `AGENTS.md` (canonical agent file) + thin `CLAUDE.md` (`@AGENTS.md`).
 - A **START-HERE map** in `AGENTS.md` — where rules, decisions, checklists, CI, and tests live.
-- `doc/adr/` — the learnings log (ADRs). `0000-template.md` is the template.
+- `docs/` — all documentation, including `docs/adr/` (the ADR learnings log; `0000-template.md`
+  is the template).
 - `README.md`, `CONTRIBUTING.md` (internal "where things live"), `CHANGELOG.md`.
 - `.gitignore`, `.editorconfig`, `.gitattributes`.
 - Conventional Commits; the `repo-standard` skill applies the conventions and checklists.
@@ -62,10 +63,18 @@ No governance overhead. A forever-private repo stays here and stays effortless.
 ## Where things live (the convention)
 
 - **Rules / orientation** → `AGENTS.md` (+ thin `CLAUDE.md`). Read the START-HERE map first.
-- **Decisions & rationale** → `doc/adr/`.
+- **Decisions & rationale** → `docs/adr/`.
 - **Conventions & checklists** → the `repo-standard` skill (this one).
 - **CI / release / publish** → `.github/workflows/`.
 - **Tests** → the type's test dir (e.g. `Tests/` for a PowerShell module).
+
+### Growing the `docs/` folder
+
+Core ships only `docs/adr/`. Add more under the same `docs/` umbrella **as you need it** — don't
+pre-create empty directories. When the docs grow substantial, a proven split is
+[Diátaxis](https://diataxis.fr/): `docs/tutorials/`, `docs/how-to/`, `docs/reference/`,
+`docs/explanation/`, plus a `docs/README.md` index and `docs/assets/` for images. Adopt it when
+you have docs to organise, not before.
 
 ## Naming conventions
 
@@ -80,7 +89,7 @@ many of these names are read by tools that require an exact case.
 | PowerShell files — `<Module>.psd1`, `<Module>.psm1`, `<Module>.Tests.ps1` | `PascalCase`, base name == module name | Microsoft requirement: the manifest/root-module base name matches the module directory name. |
 | GitHub plumbing — `.github/`, `.github/workflows/` | lowercase | Required by GitHub. |
 | GitHub templates — `.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE.md` | `UPPERCASE` dir/file; `lower_snake.md` for individual issue files (`bug_report.md`) | GitHub's documented convention. |
-| ADRs / docs — `doc/adr/0001-title.md` | `lower-kebab`, zero-padded numeric prefix | adr-tools / Nygard convention. |
+| Documentation — all under a single `docs/`; ADRs at `docs/adr/0001-title.md` | dir `docs/`; ADR files `lower-kebab` with a zero-padded numeric prefix | `docs/` is the dominant docs-dir convention; one umbrella avoids a confusing `doc/` + `docs/` split. |
 | Tool config — `.gitignore`, `.editorconfig`, `.gitattributes`, `release-please-config.json`, `.release-please-manifest.json` | exact required name | Fixed by each tool. |
 | Your own source files & dirs | the language's idiom | kebab-case (JS/TS), snake_case (Python), PascalCase (PowerShell/C#). |
 
