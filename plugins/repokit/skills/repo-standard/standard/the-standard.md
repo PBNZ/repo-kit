@@ -67,6 +67,27 @@ No governance overhead. A forever-private repo stays here and stays effortless.
 - **CI / release / publish** → `.github/workflows/`.
 - **Tests** → the type's test dir (e.g. `Tests/` for a PowerShell module).
 
+## Naming conventions
+
+RepoKit does **not** impose a single uniform casing. Each name follows the convention of the
+ecosystem that owns it — **consistency with the world beats consistency within the repo**, because
+many of these names are read by tools that require an exact case.
+
+| What | Convention | Why |
+|------|-----------|-----|
+| Root meta-docs — `README.md`, `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `AGENTS.md`, `CLAUDE.md` | `UPPERCASE.md` | Near-universal OSS convention; GitHub special-cases them and Claude Code reads `CLAUDE.md` at that exact name. |
+| PowerShell module dirs — `Public/`, `Private/`, `Tests/`, `Data/` | `PascalCase` | Microsoft-documented module layout; matches PowerShell's `Verb-Noun` PascalCase idiom. |
+| PowerShell files — `<Module>.psd1`, `<Module>.psm1`, `<Module>.Tests.ps1` | `PascalCase`, base name == module name | Microsoft requirement: the manifest/root-module base name matches the module directory name. |
+| GitHub plumbing — `.github/`, `.github/workflows/` | lowercase | Required by GitHub. |
+| GitHub templates — `.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE.md` | `UPPERCASE` dir/file; `lower_snake.md` for individual issue files (`bug_report.md`) | GitHub's documented convention. |
+| ADRs / docs — `doc/adr/0001-title.md` | `lower-kebab`, zero-padded numeric prefix | adr-tools / Nygard convention. |
+| Tool config — `.gitignore`, `.editorconfig`, `.gitattributes`, `release-please-config.json`, `.release-please-manifest.json` | exact required name | Fixed by each tool. |
+| Your own source files & dirs | the language's idiom | kebab-case (JS/TS), snake_case (Python), PascalCase (PowerShell/C#). |
+
+**Rule of thumb:** if a tool or platform reads the name, match its required case exactly; otherwise
+follow the language/ecosystem idiom; never rename a convention-bearing file just to make the tree
+look uniform.
+
 ## Promotion path
 
 Private → public → published just **switches on the next layer** over the *same* structure. Moving
