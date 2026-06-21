@@ -66,8 +66,12 @@ want to continue.
    (a) no enumerated placeholder tokens remain anywhere in the output; (b) every expected target
    file exists and no `.tmpl` suffix survived. If either fails, fix and re-check.
 
-5. **Initialise git.** In the new repo directory: `git init -b main`, stage everything, and make
-   one Conventional commit: `chore: scaffold <name> via RepoKit`.
+5. **Initialise git.** In the new repo directory: `git init -b main`, then `git add -A -f`, and
+   make one Conventional commit: `chore: scaffold <name> via RepoKit`. The `-f` force-adds the
+   scaffold's own files past any **global** gitignore — e.g. a user's global `*private*` rule would
+   otherwise silently drop a `Private/` function dir. At initial scaffold the working tree contains
+   only the files you just stamped, so force-adding all of them is safe; the repo's own `.gitignore`
+   still governs everything added later. Confirm `git status --short` is clean afterwards.
 
 6. **Offer a private remote — opt-in only.** Ask whether to create a private GitHub repo. Only if
    the user says yes: `gh repo create <name> --private --source . --remote origin`. Never public,
