@@ -1,0 +1,33 @@
+# {{name}}
+
+{{description}}
+
+## Run it
+
+```sh
+cp .env.example .env        # fill in secrets/config (.env is gitignored)
+docker compose up -d        # start the stack
+docker compose config -q    # validate the compose file
+docker compose down         # stop (add -v to also drop named volumes/data)
+```
+
+## How a change ships
+
+```mermaid
+flowchart LR
+    Edit["Edit compose.yaml / a service / config"] --> Val["docker compose config -q"]
+    Val -->|valid| Up["docker compose up -d (try locally)"]
+    Up --> Commit["Conventional commit + push"]
+    Commit --> CI["CI: docker compose config -q"]
+```
+
+## What's committed vs not
+
+- **Committed (config):** `compose.yaml`, `.env.example`, any service config files (mount them
+  read-only, e.g. `./config/app.conf:/etc/app/app.conf:ro`), and any `Dockerfile`s.
+- **Not committed (data):** persistent data uses **named volumes** (Docker-managed, outside the
+  repo). If you bind-mount data to a local folder instead, add that folder to `.gitignore`.
+- **Secrets:** real values live in `.env` (gitignored); `.env.example` is the committed template.
+
+See [`AGENTS.md`](AGENTS.md) for the START-HERE map. Follows the
+[RepoKit](https://github.com/PBNZ/repo-kit) standard.

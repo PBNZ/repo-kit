@@ -54,6 +54,7 @@ No governance overhead. A forever-private repo stays here and stays effortless.
 | Type | Adds |
 |------|------|
 | `powershell-module` | `.psd1` manifest, `.psm1` root module, `Public/` + `Private/`, `Tests/` (Pester); PSScriptAnalyzer + Pester CI; `Publish-PSResource` publish (Published) |
+| `docker-compose` | `compose.yaml` (no `version:`; named volumes for data, commented config/build patterns), `.env.example`, `.dockerignore`; `docker compose config -q` validation CI (Public). Config committed, data in named volumes, secrets in `.env` |
 | `skill-plugin` | a Claude Code plugin: `.claude-plugin/`, `skills/<skill>/SKILL.md`, validation *(stub — fill when first needed)* |
 | `collection` | a multi-component repo with a top-level map + per-component subdirs *(stub)* |
 | `mcp-server` | an MCP server *(stub)* |
