@@ -47,3 +47,10 @@ new version with the date and start a fresh `## [Unreleased]`.
   `# x-release-please-version` annotation so release-please can bump it.
 - **Marketplace-only plugins:** there's no separate registry step, so release automation is
   optional. Bump the version in the manifest(s) + `CHANGELOG.md` by hand, tag, and push.
+
+## Commit identity
+
+Commits use the GitHub **noreply** email (`<id>+<login>@users.noreply.github.com`), set
+**repo-locally**, so a repo that goes public never exposes a personal address. Use a real
+name/email only when the user explicitly wants it. `/new-repo` sets this on the scaffold commit; keep
+it for later commits too.

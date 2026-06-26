@@ -66,12 +66,25 @@ want to continue.
    (a) no enumerated placeholder tokens remain anywhere in the output; (b) every expected target
    file exists and no `.tmpl` suffix survived. If either fails, fix and re-check.
 
-5. **Initialise git.** In the new repo directory: `git init -b main`, then `git add -A -f`, and
-   make one Conventional commit: `chore: scaffold <name> via RepoKit`. The `-f` force-adds the
-   scaffold's own files past any **global** gitignore — e.g. a user's global `*private*` rule would
-   otherwise silently drop a `Private/` function dir. At initial scaffold the working tree contains
-   only the files you just stamped, so force-adding all of them is safe; the repo's own `.gitignore`
-   still governs everything added later. Confirm `git status --short` is clean afterwards.
+5. **Initialise git** in the new repo directory:
+   - **Default branch `main`, never `master`:** `git init -b main` (`-b` needs git >= 2.28; if it
+     errors, run `git init` then `git branch -m main`).
+   - **Commit identity -- anonymous by default.** So a repo that later goes public never leaks a
+     personal email, set a **repo-local** (not `--global`) identity using the GitHub *noreply*
+     address. Resolve it for the gh-authenticated user and apply it locally:
+     ```
+     gh api user --jq '"\(.name // .login)\t\(.id)+\(.login)@users.noreply.github.com"'
+     git config user.name  "<name-or-login>"
+     git config user.email "<id>+<login>@users.noreply.github.com"
+     ```
+     Use a **real** name/email only if the user explicitly asked (you may ask, but the default is the
+     noreply address). No `gh` available? Fall back to `<login>@users.noreply.github.com`, or ask.
+   - **Stage + commit:** `git add -A -f` -- the `-f` force-adds the stamped files past any global
+     gitignore (e.g. a `*private*` rule that would silently drop a `Private/` dir; safe here, the tree
+     holds only what you stamped, and the repo's own `.gitignore` governs later additions) -- then one
+     Conventional commit: `chore: scaffold <name> via RepoKit`.
+   - **Confirm:** `git status --short` is clean, `git rev-parse --abbrev-ref HEAD` prints `main`, and
+     note the commit identity you used in the final summary.
 
 6. **Offer a private remote — opt-in only.** Ask whether to create a private GitHub repo. Only if
    the user says yes: `gh repo create <name> --private --source . --remote origin`. Never public,

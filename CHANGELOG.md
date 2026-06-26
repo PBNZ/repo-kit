@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The plugin now displays as `repo-kit` in the `/plugin` UI (via `displayName`), matching the marketplace name.
+- `/new-repo` now sets a repo-local commit identity using the GitHub noreply email by default (so a new repo doesn't leak a personal address) and initialises the default branch as `main`.
 
 ## [0.1.0] - 2026-06-21
 
