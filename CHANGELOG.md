@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   diagram, and a `docker compose config -q` validation CI (Public tier).
 - The `repo-standard` skill now tells agents to check the remote after a push/PR — CI/Actions status and GitHub Copilot / reviewer feedback — before calling work done.
 
+### Changed
+
+- The plugin now displays as `repo-kit` in the `/plugin` UI (via `displayName`), matching the marketplace name.
+
 ## [0.1.0] - 2026-06-21
 
 ### Added
