@@ -37,3 +37,4 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
 - **Ceremony scales by visibility** (Core → +Public → +Published). Don't add public/published
   governance to a private repo.
 - Before committing or opening a PR, run the relevant checklist above.
+- **After a push or PR, check the remote** — confirm CI/Actions are green and address any GitHub Copilot / reviewer feedback before calling the work done (see `pre-pr-checklist.md`).

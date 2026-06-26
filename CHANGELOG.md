@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `docker-compose` repo type for `/new-repo`: a minimal `compose.yaml` (named volumes for data,
   committed config, `.env` secrets), `.env.example`, `.dockerignore`, a README with a workflow
   diagram, and a `docker compose config -q` validation CI (Public tier).
+- The `repo-standard` skill now tells agents to check the remote after a push/PR — CI/Actions status and GitHub Copilot / reviewer feedback — before calling work done.
 
 ## [0.1.0] - 2026-06-21
 
