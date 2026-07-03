@@ -8,7 +8,7 @@
 //
 // Runs inside the pinned Docker image (p2o + api-spec-converter on PATH).
 
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -16,11 +16,13 @@ import { tmpdir } from 'node:os';
 const cfg = JSON.parse(readFileSync('connectors.config.json', 'utf8'));
 const LIMIT = cfg.sizeLimitBytes ?? 1048576;
 const OUT = cfg.output ?? 'connectors';
-const work = tmpdir();
+const work = mkdtempSync(join(tmpdir(), 'ppc-')); // unique per run; removed on exit
+process.on('exit', () => { try { rmSync(work, { recursive: true, force: true }); } catch { /* best-effort */ } });
 const warnings = [];
 
-// --- locate + load the committed collection ---
-const srcName = readdirSync('source').find((f) => f.endsWith('.json'));
+// --- locate + load the committed collection (prefer the documented source/collection.json) ---
+const jsons = readdirSync('source').filter((f) => f.endsWith('.json')).sort();
+const srcName = jsons.includes('collection.json') ? 'collection.json' : jsons[0];
 if (!srcName) {
   console.log('source/ has no *.json collection yet — export your Postman collection there. Nothing to do.');
   process.exit(0);
@@ -35,11 +37,11 @@ const sizeOf = (o) => Buffer.byteLength(JSON.stringify(o, null, 2));
 const slug = (s) => (s || 'connector').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'connector';
 const kv = (arr, k) => arr?.find((e) => e.key === k)?.value;
 
-// Pre-resolve collection variables (concrete {{vars}} with a value) so host/basePath come out
-// real instead of "%7B%7Bbaseurl%7D%7D". Variables with no value are left untouched.
+// Pre-resolve collection variables that are set (including "" and "0") so host/basePath come out
+// real instead of "%7B%7Bbaseurl%7D%7D". Only variables with no value at all are left untouched.
 function resolveVars(obj, vars) {
   let s = JSON.stringify(obj);
-  for (const v of vars) if (v && v.key && v.value) s = s.split(`{{${v.key}}}`).join(v.value);
+  for (const v of vars) if (v && v.key && v.value != null) s = s.split(`{{${v.key}}}`).join(v.value);
   return JSON.parse(s);
 }
 

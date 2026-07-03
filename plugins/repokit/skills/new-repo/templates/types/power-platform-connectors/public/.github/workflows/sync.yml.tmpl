@@ -51,8 +51,8 @@ jobs:
             echo "No upstream change."
             echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          SRC=$(ls source/*.json 2>/dev/null | head -1); SRC=${SRC:-source/collection.json}
-          cp /tmp/coll.json "$SRC"
+          # Write to the canonical committed path (the generator prefers source/collection.json).
+          cp /tmp/coll.json source/collection.json
           jq -n --arg u "$URL" --arg s "$NEW" --arg t "$(date -u +%FT%TZ)" \
             '{sourceUrl:$u, sha256:$s, updatedAt:$t}' > .postman/manifest.json
           echo "changed=true" >> "$GITHUB_OUTPUT"
