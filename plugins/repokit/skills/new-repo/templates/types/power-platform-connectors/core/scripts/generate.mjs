@@ -226,20 +226,36 @@ function uniqueSlug(name) {
   usedNames.add(candidate);
   return candidate;
 }
+// Report unresolved Postman tokens ({{var}} or its %7b%7b URL-encoding) ONLY in the fields Power
+// Platform actually calls: host, basePath, schemes, path keys, and the security URLs / header name.
+// A leftover in a description or example doesn't break the connector, so scanning the whole document
+// would false-fail on collections that legitimately document a {{var}}. swagger-cli can't catch
+// these itself — it validates with validateFormats:false, so an unresolved host or tokenUrl passes.
+const TOKEN = /\{\{|%7[bB]%7[bB]/;
+function unresolvedFields(sw) {
+  const hits = [];
+  const chk = (label, val) => { if (typeof val === 'string' && TOKEN.test(val)) hits.push(label); };
+  chk('host', sw.host);
+  chk('basePath', sw.basePath);
+  (sw.schemes || []).forEach((s, i) => chk(`schemes[${i}]`, s));
+  for (const k of Object.keys(sw.paths || {})) chk(`path "${k}"`, k);
+  for (const [n, d] of Object.entries(sw.securityDefinitions || {})) {
+    chk(`${n}.authorizationUrl`, d?.authorizationUrl);
+    chk(`${n}.tokenUrl`, d?.tokenUrl);
+    chk(`${n}.name`, d?.name);
+  }
+  return hits;
+}
 function emit(name, sw) {
   let bytes = sizeOf(sw);
   if (bytes >= LIMIT) { strip(sw); bytes = sizeOf(sw); } // last-ditch shrink for an oversize def
   const file = join(OUT, `${uniqueSlug(name)}.swagger.json`);
-  const serialized = JSON.stringify(sw, null, 2);
-  writeFileSync(file, serialized);
+  writeFileSync(file, JSON.stringify(sw, null, 2));
   let valid = true;
-  // Residual Postman template tokens — {{var}} or its %7b%7b URL-encoding — mean a variable never
-  // resolved, almost always a Postman *environment* variable that isn't in the committed
-  // collection.json. swagger-cli validates with validateFormats:false, so a host/URL like
-  // "%7b%7bbaseurl%7d%7d" would otherwise pass and the connector would ship broken.
-  const unresolved = /\{\{|%7[bB]%7[bB]/.test(serialized);
+  const hits = unresolvedFields(sw);
+  const unresolved = hits.length > 0;
   if (unresolved)
-    warnings.push(`${file}: unresolved {{variables}} — likely a Postman environment variable not in the committed collection; the connector will not work until these are provided`);
+    warnings.push(`${file}: unresolved {{variables}} in ${hits.join(', ')} — likely a Postman environment variable not in the committed collection; the connector will not work until these are provided`);
   try { execFileSync('swagger-cli', ['validate', file], { stdio: 'pipe' }); }
   catch (err) { valid = false; warnings.push(`validation failed for ${file}: ${(err.stderr?.toString() || err.message || '').trim()}`); }
   written.push({ file, bytes, over: bytes >= LIMIT, valid, unresolved });
