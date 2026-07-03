@@ -37,13 +37,16 @@ jobs:
               echo "sourceUrl is not set in connectors.config.json — skipping."
               echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0;;
           esac
-          # Send the Postman API key only to the real Postman API host (a substring match would also
-          # hit look-alikes like api.getpostman.com.evil.tld). --max-redirs 0 fails closed if that
-          # host ever 3xx-redirects: curl re-sends custom headers across hosts on redirect, so this
-          # prevents the key leaking to another host.
+          # Send the Postman API key only to a genuine Postman API host (all three verified official:
+          # api.getpostman.com legacy, api.postman.com standard, api.eu.postman.com EU data
+          # residency). The trailing "/" anchors each match so a look-alike like
+          # api.getpostman.com.evil.tld cannot match. --max-redirs 0 fails closed if a host ever
+          # 3xx-redirects: curl re-sends custom headers across hosts on redirect, so this prevents
+          # the key leaking to another host.
           AUTH=()
-          case "$URL" in "https://api.getpostman.com/"*)
-            [ -n "${POSTMAN_API_KEY:-}" ] && AUTH=(--max-redirs 0 -H "X-Api-Key: ${POSTMAN_API_KEY}");;
+          case "$URL" in
+            "https://api.getpostman.com/"* | "https://api.postman.com/"* | "https://api.eu.postman.com/"*)
+              [ -n "${POSTMAN_API_KEY:-}" ] && AUTH=(--max-redirs 0 -H "X-Api-Key: ${POSTMAN_API_KEY}");;
           esac
           curl -fsSL --proto '=https' --proto-redir '=https' --max-time 60 --retry 3 "${AUTH[@]}" "$URL" -o /tmp/fetched.json
           # Unwrap the Postman API's {"collection": …} envelope if present.
@@ -89,10 +92,13 @@ jobs:
           git add source/collection.json .postman/manifest.json connectors/
           git commit -m "chore: sync connector definitions from upstream Postman collection"
           git push -f -u origin "$BR"
-          # Open a PR only if one isn't already open for this branch. Don't swallow other errors
-          # (e.g. "GitHub Actions is not permitted to create pull requests") — a silently-dead sync
-          # must fail loudly.
-          if ! gh pr view "$BR" --json number >/dev/null 2>&1; then
+          # Open a PR only if one isn't already OPEN for this branch. Use `gh pr list` (open PRs
+          # only), NOT `gh pr view` — the latter returns the branch's most recent PR even when it is
+          # merged/closed, so after the first sync PR merges we'd wrongly think one still exists and
+          # never open another. Command substitution under `set -e` still fails loudly if gh errors
+          # (e.g. "GitHub Actions is not permitted to create pull requests") — a dead sync must be visible.
+          OPEN=$(gh pr list --head "$BR" --state open --json number --jq 'length')
+          if [ "${OPEN:-0}" -eq 0 ]; then
             gh pr create --base main --head "$BR" \
               --title "Sync connector definitions from upstream Postman collection" \
               --body "The upstream Postman collection changed. Regenerated OpenAPI 2.0 definitions (validated as Swagger 2.0, each < 1 MB). **Review before importing to Power Platform** — the Postman-to-2.0 conversion is lossy."

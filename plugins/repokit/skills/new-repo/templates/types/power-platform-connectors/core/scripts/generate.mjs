@@ -134,7 +134,7 @@ function fixResponses(sw) {
     if (!path || typeof path !== 'object') continue;
     for (const m of METHODS) {
       const op = path[m];
-      if (op && typeof op === 'object' && op.responses)
+      if (op && typeof op === 'object' && op.responses && typeof op.responses === 'object')
         for (const [code, r] of Object.entries(op.responses))
           if (r && typeof r === 'object' && !r.$ref && !r.description) r.description = REASON[code] || 'Response';
     }
@@ -153,7 +153,7 @@ function fixPaths(sw) {
       for (const m of METHODS) {
         const op = item[m];
         if (op && typeof op === 'object') {
-          op.parameters = op.parameters || [];
+          if (!Array.isArray(op.parameters)) op.parameters = []; // tolerate a malformed non-array
           for (const t of tokens)
             if (!op.parameters.some((p) => p.in === 'path' && p.name === t))
               op.parameters.push({ name: t, in: 'path', required: true, type: 'string' });
@@ -237,7 +237,7 @@ function unresolvedFields(sw) {
   const chk = (label, val) => { if (typeof val === 'string' && TOKEN.test(val)) hits.push(label); };
   chk('host', sw.host);
   chk('basePath', sw.basePath);
-  (sw.schemes || []).forEach((s, i) => chk(`schemes[${i}]`, s));
+  (Array.isArray(sw.schemes) ? sw.schemes : []).forEach((s, i) => chk(`schemes[${i}]`, s));
   for (const k of Object.keys(sw.paths || {})) chk(`path "${k}"`, k);
   for (const [n, d] of Object.entries(sw.securityDefinitions || {})) {
     chk(`${n}.authorizationUrl`, d?.authorizationUrl);
