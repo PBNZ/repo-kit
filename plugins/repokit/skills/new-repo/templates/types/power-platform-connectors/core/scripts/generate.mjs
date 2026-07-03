@@ -22,6 +22,7 @@ const cleanup = () => { try { rmSync(work, { recursive: true, force: true }); } 
 process.on('exit', cleanup);
 for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { cleanup(); process.exit(1); });
 const warnings = [];
+let hadError = false; // set when a (sub)collection fails to convert, so we still exit non-zero
 
 // --- locate + load the committed collection (prefer the documented source/collection.json) ---
 const jsons = existsSync('source') ? readdirSync('source').filter((f) => f.endsWith('.json')).sort() : [];
@@ -40,6 +41,17 @@ const sizeOf = (o) => Buffer.byteLength(JSON.stringify(o, null, 2));
 const slug = (s) => (s || 'connector').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'connector';
 const kv = (arr, k) => arr?.find((e) => e.key === k)?.value;
 
+// Detect auth set only on individual requests. We map collection/folder-level auth, not per-request
+// auth, so without this a request-auth-only collection would ship with no securityDefinitions and no
+// warning at all.
+function hasRequestAuth(items) {
+  for (const it of items || []) {
+    if (it?.request?.auth?.type && it.request.auth.type !== 'noauth') return true;
+    if (it?.item && hasRequestAuth(it.item)) return true;
+  }
+  return false;
+}
+
 // Pre-resolve collection variables that are set (including "" and "0") so host/basePath come out
 // real instead of "%7B%7Bbaseurl%7D%7D". Walk the parsed object and substitute inside string values
 // only — safe against values containing quotes/backslashes/newlines (a raw string-replace on the
@@ -47,7 +59,13 @@ const kv = (arr, k) => arr?.find((e) => e.key === k)?.value;
 function resolveVars(obj, vars) {
   if (typeof obj === 'string') {
     let s = obj;
-    for (const v of vars) if (v && v.key && v.value != null) s = s.split(`{{${v.key}}}`).join(String(v.value));
+    // Repeat until stable (bounded) so a nested var resolves regardless of its order in vars[]:
+    // baseUrl="{{proto}}://host" needs a second pass to also resolve {{proto}}.
+    for (let pass = 0; pass < 5 && s.includes('{{'); pass++) {
+      const before = s;
+      for (const v of vars) if (v && v.key && v.value != null) s = s.split(`{{${v.key}}}`).join(String(v.value));
+      if (s === before) break;
+    }
     return s;
   }
   if (Array.isArray(obj)) return obj.map((x) => resolveVars(x, vars));
@@ -59,10 +77,11 @@ function resolveVars(obj, vars) {
 // (e.g. apikey -> {type:http, scheme:apikey}, which is invalid 2.0 AND drops the header name),
 // so we build them from the source collection instead.
 function pmAuthToSwagger(auth) {
-  if (!auth || !auth.type) return null;
+  if (!auth || !auth.type || auth.type === 'noauth') return null; // noauth = intentional no security
+  const attrs = (k) => (Array.isArray(auth[k]) ? auth[k] : []); // v2.0 object-form auth would crash kv()
   switch (auth.type) {
     case 'apikey': {
-      const a = auth.apikey || [];
+      const a = attrs('apikey');
       const loc = (kv(a, 'in') || 'header').toLowerCase() === 'query' ? 'query' : 'header';
       return { name: 'apiKeyAuth', def: { type: 'apiKey', name: kv(a, 'key') || 'Authorization', in: loc } };
     }
@@ -71,11 +90,34 @@ function pmAuthToSwagger(auth) {
     case 'basic':
       return { name: 'basicAuth', def: { type: 'basic' } };
     case 'oauth2': {
-      const a = auth.oauth2 || [];
+      const a = attrs('oauth2');
       const authorizationUrl = kv(a, 'authUrl');
       const tokenUrl = kv(a, 'accessTokenUrl');
-      if (!authorizationUrl || !tokenUrl) return null; // 2.0 accessCode flow requires both URLs
-      return { name: 'oauth2Auth', def: { type: 'oauth2', flow: 'accessCode', authorizationUrl, tokenUrl, scopes: {} } };
+      const grant = (kv(a, 'grant_type') || '').toLowerCase();
+      // Pick the Swagger 2.0 oauth2 flow. Prefer Postman's grant_type (substring match — robust to
+      // the exact string), else infer from which URLs are present. Emit only the URL(s) that flow
+      // requires, verified against the OpenAPI 2.0 spec: implicit->authorizationUrl,
+      // password/application->tokenUrl, accessCode->both. (Postman's earlier hardcoded-accessCode
+      // path shipped a NO-auth connector for client-credentials/password/implicit grants.)
+      let flow;
+      if (grant.includes('client')) flow = 'application';
+      else if (grant.includes('password')) flow = 'password';
+      else if (grant.includes('implicit')) flow = 'implicit';
+      else if (grant.includes('authorization') || grant.includes('code')) flow = 'accessCode';
+      else if (authorizationUrl && tokenUrl) flow = 'accessCode';
+      else if (tokenUrl) flow = 'application';
+      else if (authorizationUrl) flow = 'implicit';
+      else return null; // no grant_type and no URLs — nothing usable
+      const def = { type: 'oauth2', flow, scopes: {} };
+      if (flow === 'accessCode' || flow === 'implicit') {
+        if (!authorizationUrl) return null;
+        def.authorizationUrl = authorizationUrl;
+      }
+      if (flow === 'accessCode' || flow === 'application' || flow === 'password') {
+        if (!tokenUrl) return null;
+        def.tokenUrl = tokenUrl;
+      }
+      return { name: 'oauth2Auth', def };
     }
     default:
       return null;
@@ -126,12 +168,16 @@ function fixPaths(sw) {
 // Replace whatever the converter produced with a correct security definition derived from the
 // Postman auth (Power Platform picks the single top securityDefinition, so we emit exactly one).
 function fixSecurity(sw, auth) {
-  const s = pmAuthToSwagger(auth);
+  // Resolve committed {{vars}} in the auth block too — otherwise a variable used as an OAuth URL or
+  // an apiKey header name would leak into securityDefinitions literally (and swagger-cli validates
+  // with validateFormats:false, so a bad URL would pass silently).
+  const s = pmAuthToSwagger(resolveVars(auth, rootVars));
   if (s) {
     sw.securityDefinitions = { [s.name]: s.def };
     sw.security = [{ [s.name]: [] }];
   } else {
-    if (auth?.type) warnings.push(`auth type "${auth.type}" not mapped — add security manually in the connector`);
+    if (auth?.type && auth.type !== 'noauth')
+      warnings.push(`auth type "${auth.type}" not fully mapped (missing URL/grant details?) — add security manually in the connector`);
     delete sw.securityDefinitions; // never ship an invalid securityDefinitions block
     delete sw.security;
   }
@@ -184,16 +230,47 @@ function emit(name, sw) {
   let bytes = sizeOf(sw);
   if (bytes >= LIMIT) { strip(sw); bytes = sizeOf(sw); } // last-ditch shrink for an oversize def
   const file = join(OUT, `${uniqueSlug(name)}.swagger.json`);
-  writeFileSync(file, JSON.stringify(sw, null, 2));
+  const serialized = JSON.stringify(sw, null, 2);
+  writeFileSync(file, serialized);
   let valid = true;
+  // Residual Postman template tokens — {{var}} or its %7b%7b URL-encoding — mean a variable never
+  // resolved, almost always a Postman *environment* variable that isn't in the committed
+  // collection.json. swagger-cli validates with validateFormats:false, so a host/URL like
+  // "%7b%7bbaseurl%7d%7d" would otherwise pass and the connector would ship broken.
+  const unresolved = /\{\{|%7[bB]%7[bB]/.test(serialized);
+  if (unresolved)
+    warnings.push(`${file}: unresolved {{variables}} — likely a Postman environment variable not in the committed collection; the connector will not work until these are provided`);
   try { execFileSync('swagger-cli', ['validate', file], { stdio: 'pipe' }); }
   catch (err) { valid = false; warnings.push(`validation failed for ${file}: ${(err.stderr?.toString() || err.message || '').trim()}`); }
-  written.push({ file, bytes, over: bytes >= LIMIT, valid });
+  written.push({ file, bytes, over: bytes >= LIMIT, valid, unresolved });
 }
 
-// --- convert whole; split only if it wouldn't fit ---
-const whole = convert(collection, 'whole', rootAuth);
-if (sizeOf(whole) < LIMIT) {
+// Convert one (sub)collection and emit it; on converter failure, record it and keep going so one
+// bad folder doesn't abort the rest of the split (p2o / api-spec-converter throw on any non-zero).
+function tryEmit(name, coll, tag, auth) {
+  try {
+    emit(name, convert(coll, tag, auth));
+  } catch (err) {
+    hadError = true;
+    warnings.push(`"${name}" failed to convert: ${(err.message || err).toString().trim()}`);
+  }
+}
+
+// H3: auth on individual requests is not mapped — warn rather than silently ship an authless connector.
+if (!rootAuth && hasRequestAuth(collection.item)) {
+  warnings.push('auth is set per-request in this collection; only collection/folder-level auth is mapped, so the connector(s) have no securityDefinitions — add auth manually after import');
+}
+
+// --- convert whole; split only if it *still* wouldn't fit after dropping examples ---
+let whole = null, wholeBytes = Infinity;
+try {
+  whole = convert(collection, 'whole', rootAuth);
+  wholeBytes = sizeOf(whole);
+  if (wholeBytes >= LIMIT) { strip(whole); wholeBytes = sizeOf(whole); } // try examples-off before splitting
+} catch (err) {
+  warnings.push(`whole-collection conversion failed (${(err.message || err).toString().trim()}); falling back to per-folder`);
+}
+if (whole && wholeBytes < LIMIT) {
   emit(collection.info?.name || srcName.replace(/\.json$/, ''), whole);
 } else {
   const roots = collection.item || [];
@@ -205,21 +282,21 @@ if (sizeOf(whole) < LIMIT) {
       auth: folder.auth || rootAuth,
       item: folder.item,
     };
-    emit(fname, convert(sub, slug(fname), folder.auth || rootAuth));
+    tryEmit(fname, sub, slug(fname), folder.auth || rootAuth);
   }
   const loose = roots.filter((it) => it && it.request);
   if (loose.length) {
     const sub = { info: { ...collection.info, name: `${collection.info?.name || ''} - misc` }, variable: rootVars, auth: rootAuth, item: loose };
-    emit('misc', convert(sub, 'misc', rootAuth));
+    tryEmit('misc', sub, 'misc', rootAuth);
   }
 }
 
 // --- report ---
-for (const w of written) console.log(`${(w.bytes / 1024).toFixed(1)} KB  ${w.file}${w.over ? `  ** OVER ${limitStr} **` : ''}${w.valid ? '' : '  ** INVALID Swagger 2.0 **'}`);
+for (const w of written) console.log(`${(w.bytes / 1024).toFixed(1)} KB  ${w.file}${w.over ? `  ** OVER ${limitStr} **` : ''}${!w.valid ? '  ** INVALID Swagger 2.0 **' : ''}${w.unresolved ? '  ** UNRESOLVED {{variables}} **' : ''}`);
 for (const w of [...new Set(warnings)]) console.warn(`warning: ${w}`);
-const bad = written.filter((w) => w.over || !w.valid);
-if (bad.length) {
-  console.error(`\n${bad.length} definition(s) are over ${limitStr} or not valid Swagger 2.0 — split that folder further, trim the collection, or fix the source. See flags above.`);
+const bad = written.filter((w) => w.over || !w.valid || w.unresolved);
+if (bad.length || hadError) {
+  console.error(`\n${bad.length + (hadError ? 1 : 0)} problem(s): definitions over ${limitStr}, not valid Swagger 2.0, with unresolved {{variables}}, or a folder that failed to convert — split that folder further, trim the collection, or fix the source. See flags above.`);
   process.exit(2);
 }
 console.log(`\n${written.length} connector definition(s) written to ${OUT}/ — all valid Swagger 2.0, all < ${limitStr}.`);

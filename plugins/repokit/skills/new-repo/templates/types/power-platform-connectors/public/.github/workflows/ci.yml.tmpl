@@ -9,6 +9,9 @@ on:
     paths: ['source/**', 'scripts/**', 'Dockerfile', 'connectors.config.json']
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   generate:
     name: generate + validate connector definitions
@@ -20,4 +23,4 @@ jobs:
         run: docker build -t ppc-gen .
 
       - name: Generate + self-validate (fails on invalid Swagger 2.0 or over the size limit)
-        run: docker run --rm --user "$(id -u):$(id -g)" -v "${{ github.workspace }}:/work" -w /work ppc-gen node scripts/generate.mjs
+        run: docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -v "${{ github.workspace }}:/work" -w /work ppc-gen node scripts/generate.mjs
