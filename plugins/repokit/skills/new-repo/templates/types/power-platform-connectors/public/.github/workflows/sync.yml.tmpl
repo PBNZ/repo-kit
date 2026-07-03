@@ -52,6 +52,7 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
           # Write to the canonical committed path (the generator prefers source/collection.json).
+          mkdir -p source .postman
           cp /tmp/coll.json source/collection.json
           jq -n --arg u "$URL" --arg s "$NEW" --arg t "$(date -u +%FT%TZ)" \
             '{sourceUrl:$u, sha256:$s, updatedAt:$t}' > .postman/manifest.json
@@ -71,13 +72,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          BR="sync/postman-$(date -u +%Y%m%d%H%M%S)"
+          # Reuse one branch/PR so daily runs update the existing PR instead of piling up new ones.
+          BR="sync/postman"
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BR"
+          git checkout -B "$BR"
           git add -A
           git commit -m "chore: sync connector definitions from upstream Postman collection"
-          git push -u origin "$BR"
+          git push -f -u origin "$BR"
           gh pr create --base main --head "$BR" \
             --title "Sync connector definitions from upstream Postman collection" \
-            --body "The upstream Postman collection changed. Regenerated OpenAPI 2.0 definitions (validated as Swagger 2.0, each < 1 MB). **Review before importing to Power Platform** — the Postman-to-2.0 conversion is lossy."
+            --body "The upstream Postman collection changed. Regenerated OpenAPI 2.0 definitions (validated as Swagger 2.0, each < 1 MB). **Review before importing to Power Platform** — the Postman-to-2.0 conversion is lossy." || true

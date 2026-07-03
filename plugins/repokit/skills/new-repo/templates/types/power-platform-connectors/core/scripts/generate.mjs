@@ -8,7 +8,7 @@
 //
 // Runs inside the pinned Docker image (p2o + api-spec-converter on PATH).
 
-import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, readdirSync, rmSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -21,10 +21,10 @@ process.on('exit', () => { try { rmSync(work, { recursive: true, force: true });
 const warnings = [];
 
 // --- locate + load the committed collection (prefer the documented source/collection.json) ---
-const jsons = readdirSync('source').filter((f) => f.endsWith('.json')).sort();
+const jsons = existsSync('source') ? readdirSync('source').filter((f) => f.endsWith('.json')).sort() : [];
 const srcName = jsons.includes('collection.json') ? 'collection.json' : jsons[0];
 if (!srcName) {
-  console.log('source/ has no *.json collection yet — export your Postman collection there. Nothing to do.');
+  console.log('source/ has no *.json collection yet — export your Postman collection to source/collection.json. Nothing to do.');
   process.exit(0);
 }
 const rawObj = JSON.parse(readFileSync(join('source', srcName), 'utf8'));
@@ -38,11 +38,18 @@ const slug = (s) => (s || 'connector').toLowerCase().replace(/[^a-z0-9]+/g, '-')
 const kv = (arr, k) => arr?.find((e) => e.key === k)?.value;
 
 // Pre-resolve collection variables that are set (including "" and "0") so host/basePath come out
-// real instead of "%7B%7Bbaseurl%7D%7D". Only variables with no value at all are left untouched.
+// real instead of "%7B%7Bbaseurl%7D%7D". Walk the parsed object and substitute inside string values
+// only — safe against values containing quotes/backslashes/newlines (a raw string-replace on the
+// serialized JSON could produce invalid JSON).
 function resolveVars(obj, vars) {
-  let s = JSON.stringify(obj);
-  for (const v of vars) if (v && v.key && v.value != null) s = s.split(`{{${v.key}}}`).join(v.value);
-  return JSON.parse(s);
+  if (typeof obj === 'string') {
+    let s = obj;
+    for (const v of vars) if (v && v.key && v.value != null) s = s.split(`{{${v.key}}}`).join(String(v.value));
+    return s;
+  }
+  if (Array.isArray(obj)) return obj.map((x) => resolveVars(x, vars));
+  if (obj && typeof obj === 'object') { const r = {}; for (const [k, val] of Object.entries(obj)) r[k] = resolveVars(val, vars); return r; }
+  return obj;
 }
 
 // Map a Postman auth block to a valid Swagger 2.0 security definition. p2o mis-maps these
@@ -123,8 +130,10 @@ function convert(coll, tag, effectiveAuth) {
   const pin = join(work, `${tag}.postman.json`);
   const oas = join(work, `${tag}.oas3.yml`);
   writeFileSync(pin, JSON.stringify(resolveVars(coll, coll.variable?.length ? coll.variable : rootVars)));
-  execFileSync('p2o', [pin, '-f', oas], { stdio: 'pipe' });
-  const raw = execFileSync('api-spec-converter', ['--from=openapi_3', '--to=swagger_2', '--syntax=json', oas], { stdio: 'pipe' });
+  // Show the converters' own warnings/errors (stderr) so a bad collection is debuggable; still
+  // capture api-spec-converter's stdout (the Swagger JSON).
+  execFileSync('p2o', [pin, '-f', oas], { stdio: ['ignore', 'ignore', 'inherit'] });
+  const raw = execFileSync('api-spec-converter', ['--from=openapi_3', '--to=swagger_2', '--syntax=json', oas], { stdio: ['ignore', 'pipe', 'inherit'] });
   const sw = JSON.parse(raw.toString());
   fixPaths(sw);
   fixResponses(sw);
@@ -150,7 +159,8 @@ function emit(name, sw) {
   const file = join(OUT, `${slug(name)}.swagger.json`);
   writeFileSync(file, JSON.stringify(sw, null, 2));
   let valid = true;
-  try { execFileSync('swagger-cli', ['validate', file], { stdio: 'pipe' }); } catch { valid = false; }
+  try { execFileSync('swagger-cli', ['validate', file], { stdio: 'pipe' }); }
+  catch (err) { valid = false; warnings.push(`validation failed for ${file}: ${(err.stderr?.toString() || err.message || '').trim()}`); }
   written.push({ file, bytes, over: bytes >= LIMIT, valid });
 }
 
