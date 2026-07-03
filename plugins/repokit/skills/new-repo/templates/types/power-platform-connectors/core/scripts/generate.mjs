@@ -94,7 +94,7 @@ function fixResponses(sw) {
       const op = path[m];
       if (op && typeof op === 'object' && op.responses)
         for (const [code, r] of Object.entries(op.responses))
-          if (r && typeof r === 'object' && !r.description) r.description = REASON[code] || 'Response';
+          if (r && typeof r === 'object' && !r.$ref && !r.description) r.description = REASON[code] || 'Response';
     }
   }
 }
@@ -172,12 +172,13 @@ mkdirSync(OUT, { recursive: true });
 for (const f of readdirSync(OUT)) if (f.endsWith('.swagger.json')) rmSync(join(OUT, f));
 
 const written = [];
-const usedSlugs = new Map();
+const usedNames = new Set();
 function uniqueSlug(name) {
   const base = slug(name);
-  const n = (usedSlugs.get(base) || 0) + 1;
-  usedSlugs.set(base, n);
-  return n === 1 ? base : `${base}-${n}`; // disambiguate folders that slug to the same name
+  let candidate = base, n = 1;
+  while (usedNames.has(candidate)) candidate = `${base}-${++n}`; // avoids cross-collisions with real "…-2" names
+  usedNames.add(candidate);
+  return candidate;
 }
 function emit(name, sw) {
   let bytes = sizeOf(sw);
