@@ -1,0 +1,5 @@
+{
+  "sourceUrl": "<fill me: a public URL to the Postman collection JSON, e.g. a GitHub raw file; or the Postman API endpoint if it is Postman-only>",
+  "sizeLimitBytes": 1048576,
+  "output": "connectors"
+}

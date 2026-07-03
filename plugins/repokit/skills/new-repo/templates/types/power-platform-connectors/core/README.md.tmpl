@@ -1,0 +1,62 @@
+# {{name}}
+
+{{description}}
+
+OpenAPI **2.0** connector definitions for **Microsoft Power Platform** custom connectors,
+generated from a Postman collection. Each definition is valid Swagger 2.0 and kept **under 1 MB**
+(Power Platform's limits — 3.0 is not supported). The collection is **committed to this repo**, so
+anyone can regenerate the connectors with just Docker — no Postman account needed.
+
+## How it works
+
+```mermaid
+flowchart LR
+    Src["source/collection.json<br/>(committed Postman collection)"] --> Gen["generate.mjs, in Docker"]
+    Gen --> Q{"whole def under 1 MB?"}
+    Q -->|yes| One["one connectors/*.swagger.json"]
+    Q -->|no| Split["split per top-level folder"]
+    One --> Val["validate: Swagger 2.0 + under 1 MB"]
+    Split --> Val
+    Val --> Imp["import into Power Platform"]
+```
+
+## Use it
+
+1. Export your Postman collection (v2.1) and save it as **`source/collection.json`**.
+2. Set `sourceUrl` in **`connectors.config.json`** — a public URL to the collection JSON (a GitHub
+   raw file or the vendor's site), or the Postman API endpoint if the collection lives only in
+   Postman.
+3. Generate the definitions (one Docker command — no local Node needed):
+
+   ```sh
+   docker build -t {{name}}-gen .
+   docker run --rm -v "${PWD}:/work" {{name}}-gen node scripts/generate.mjs
+   ```
+
+   It writes `connectors/*.swagger.json` — **one file if the whole collection fits under 1 MB,
+   otherwise one per top-level folder**. Every file is validated as Swagger 2.0 and checked < 1 MB;
+   the run fails if any definition is invalid or oversize.
+4. In Power Platform (Power Automate / Power Apps / Logic Apps): **New custom connector → Import an
+   OpenAPI file** → pick a `connectors/*.swagger.json`.
+
+## Keeping it up to date
+
+- **CI** (`.github/workflows/ci.yml`) rebuilds + regenerates + validates on every change to
+  `source/`, `scripts/`, the `Dockerfile`, or the config.
+- **Auto-sync** (`.github/workflows/sync.yml`) runs daily: it fetches `sourceUrl`, and if the
+  upstream collection changed, it updates `source/collection.json`, regenerates, validates, and
+  opens a **PR** for you to review. Account-free when `sourceUrl` is a public URL. If the collection
+  lives only in Postman, add a `POSTMAN_API_KEY` repo secret (only the maintainer needs it — never
+  cloners), and enable *Settings → Actions → Allow GitHub Actions to create and approve pull requests*.
+
+## Heads-up — review before importing
+
+The Postman → Swagger 2.0 conversion is **lossy** (it drops `oneOf/anyOf`, `nullable`, and derives
+response schemas from saved example responses). The pipeline fixes the common breakages
+(host/basePath, security definitions, response descriptions) and validates every output, but
+**review the connector in the PR before importing**. Richer collections — with saved example
+responses and a single clear auth scheme — produce better connectors. Power Platform also picks the
+single top security definition and rejects OAuth client-credentials.
+
+See [`AGENTS.md`](AGENTS.md) for the START-HERE map. Follows the
+[RepoKit](https://github.com/PBNZ/repo-kit) standard.

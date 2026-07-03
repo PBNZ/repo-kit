@@ -26,14 +26,14 @@ Gather these from the user's arguments / message, else ask — keep it to load-b
 
 - **name** — the repo / directory name (kebab-case).
 - **description** — one line.
-- **type** — one of: `powershell-module`, `docker-compose`, `skill-plugin`, `collection`, `mcp-server`, `app-ts`,
-  `app-python`, `script-collection`.
+- **type** — one of: `powershell-module`, `docker-compose`, `power-platform-connectors`,
+  `skill-plugin`, `collection`, `mcp-server`, `app-ts`, `app-python`, `script-collection`.
 - **visibility** — `private` (= Core tier), `public` (= +Public), or `published` (= +Published).
 - **author** — default `Peter Braun` (`PBNZ`).
 - **license** — default `Apache-2.0`.
 - For `powershell-module` only: **ModuleName** (PascalCase, e.g. `MyModule`).
 
-If the chosen type is a **stub** (anything other than `powershell-module` or `docker-compose`), tell the user so: the
+If the chosen type is a **stub** (anything other than `powershell-module`, `docker-compose`, or `power-platform-connectors`), tell the user so: the
 Core/Public/Published files get stamped, but there's no type-specific structure yet. Confirm they
 want to continue.
 

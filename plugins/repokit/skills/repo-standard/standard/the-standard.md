@@ -55,6 +55,7 @@ No governance overhead. A forever-private repo stays here and stays effortless.
 |------|------|
 | `powershell-module` | `.psd1` manifest, `.psm1` root module, `Public/` + `Private/`, `Tests/` (Pester); PSScriptAnalyzer + Pester CI; `Publish-PSResource` publish (Published) |
 | `docker-compose` | `compose.yaml` (no `version:`; named volumes for data, commented config/build patterns), `.env.example`, `.dockerignore`; `docker compose config -q` validation CI (Public). Config committed, data in named volumes, secrets in `.env` |
+| `power-platform-connectors` | a committed Postman collection → **OpenAPI 2.0** custom-connector definitions for Microsoft Power Platform. A pinned-Docker generator (`postman-to-openapi` + `api-spec-converter`) converts + normalises to valid Swagger 2.0, splitting per top-level folder **only when a single def would hit the 1 MB limit**; self-validates; a scheduled sync workflow PRs upstream changes. Builds with just Docker — no Postman account (Public) |
 | `skill-plugin` | a Claude Code plugin: `.claude-plugin/`, `skills/<skill>/SKILL.md`, validation *(stub — fill when first needed)* |
 | `collection` | a multi-component repo with a top-level map + per-component subdirs *(stub)* |
 | `mcp-server` | an MCP server *(stub)* |
