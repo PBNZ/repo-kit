@@ -72,7 +72,10 @@ function pmAuthToSwagger(auth) {
       return { name: 'basicAuth', def: { type: 'basic' } };
     case 'oauth2': {
       const a = auth.oauth2 || [];
-      return { name: 'oauth2Auth', def: { type: 'oauth2', flow: 'accessCode', authorizationUrl: kv(a, 'authUrl') || '', tokenUrl: kv(a, 'accessTokenUrl') || '', scopes: {} } };
+      const authorizationUrl = kv(a, 'authUrl');
+      const tokenUrl = kv(a, 'accessTokenUrl');
+      if (!authorizationUrl || !tokenUrl) return null; // 2.0 accessCode flow requires both URLs
+      return { name: 'oauth2Auth', def: { type: 'oauth2', flow: 'accessCode', authorizationUrl, tokenUrl, scopes: {} } };
     }
     default:
       return null;
@@ -131,6 +134,13 @@ function fixSecurity(sw, auth) {
     if (auth?.type) warnings.push(`auth type "${auth.type}" not mapped — add security manually in the connector`);
     delete sw.securityDefinitions; // never ship an invalid securityDefinitions block
     delete sw.security;
+  }
+  // Drop any operation-level security the converter emitted — it points at the old (now replaced
+  // or deleted) definition, i.e. a dangling reference. The single root-level security applies to
+  // every operation.
+  for (const path of Object.values(sw.paths || {})) {
+    if (!path || typeof path !== 'object') continue;
+    for (const m of METHODS) if (path[m] && typeof path[m] === 'object') delete path[m].security;
   }
 }
 
@@ -191,13 +201,14 @@ if (sizeOf(whole) < LIMIT) {
     const sub = {
       info: { ...collection.info, name: `${collection.info?.name || ''} - ${fname}`.trim() },
       variable: rootVars,
+      auth: folder.auth || rootAuth,
       item: folder.item,
     };
     emit(fname, convert(sub, slug(fname), folder.auth || rootAuth));
   }
   const loose = roots.filter((it) => it && it.request);
   if (loose.length) {
-    const sub = { info: { ...collection.info, name: `${collection.info?.name || ''} - misc` }, variable: rootVars, item: loose };
+    const sub = { info: { ...collection.info, name: `${collection.info?.name || ''} - misc` }, variable: rootVars, auth: rootAuth, item: loose };
     emit('misc', convert(sub, 'misc', rootAuth));
   }
 }

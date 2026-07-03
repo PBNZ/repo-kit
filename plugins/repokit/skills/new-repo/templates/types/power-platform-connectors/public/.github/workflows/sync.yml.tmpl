@@ -33,12 +33,13 @@ jobs:
               echo "sourceUrl is not set in connectors.config.json — skipping."
               echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0;;
           esac
-          # Send the Postman API key only when hitting the Postman API.
+          # Send the Postman API key only to the real Postman API host (a substring match would also
+          # hit look-alikes like api.getpostman.com.evil.tld).
           AUTH=()
-          case "$URL" in *api.getpostman.com*)
+          case "$URL" in "https://api.getpostman.com/"*)
             [ -n "${POSTMAN_API_KEY:-}" ] && AUTH=(-H "X-Api-Key: ${POSTMAN_API_KEY}");;
           esac
-          curl -fsSL "${AUTH[@]}" "$URL" -o /tmp/fetched.json
+          curl -fsSL --max-time 60 --retry 3 "${AUTH[@]}" "$URL" -o /tmp/fetched.json
           # Unwrap the Postman API's {"collection": …} envelope if present.
           if jq -e '.collection' /tmp/fetched.json >/dev/null 2>&1; then
             jq '.collection' /tmp/fetched.json > /tmp/coll.json
@@ -46,7 +47,7 @@ jobs:
             cp /tmp/fetched.json /tmp/coll.json
           fi
           NEW=$(jq -S 'del(.info._postman_id)' /tmp/coll.json | sha256sum | cut -d' ' -f1)
-          OLD=$(jq -r '.sha256 // ""' .postman/manifest.json)
+          OLD=$(jq -r '.sha256 // ""' .postman/manifest.json 2>/dev/null || echo "")
           if [ "$NEW" = "$OLD" ]; then
             echo "No upstream change."
             echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
