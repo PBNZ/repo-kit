@@ -15,6 +15,7 @@ import { tmpdir } from 'node:os';
 
 const cfg = JSON.parse(readFileSync('connectors.config.json', 'utf8'));
 const LIMIT = cfg.sizeLimitBytes ?? 1048576;
+const limitStr = LIMIT >= 1048576 ? `${+(LIMIT / 1048576).toFixed(2)} MB` : `${Math.round(LIMIT / 1024)} KB`;
 const OUT = cfg.output ?? 'connectors';
 const work = mkdtempSync(join(tmpdir(), 'ppc-')); // unique per run; removed on exit
 process.on('exit', () => { try { rmSync(work, { recursive: true, force: true }); } catch { /* best-effort */ } });
@@ -186,11 +187,11 @@ if (sizeOf(whole) < LIMIT) {
 }
 
 // --- report ---
-for (const w of written) console.log(`${(w.bytes / 1024).toFixed(1)} KB  ${w.file}${w.over ? '  ** OVER 1MB **' : ''}${w.valid ? '' : '  ** INVALID Swagger 2.0 **'}`);
+for (const w of written) console.log(`${(w.bytes / 1024).toFixed(1)} KB  ${w.file}${w.over ? `  ** OVER ${limitStr} **` : ''}${w.valid ? '' : '  ** INVALID Swagger 2.0 **'}`);
 for (const w of [...new Set(warnings)]) console.warn(`warning: ${w}`);
 const bad = written.filter((w) => w.over || !w.valid);
 if (bad.length) {
-  console.error(`\n${bad.length} definition(s) are over 1 MB or not valid Swagger 2.0 — split that folder further, trim the collection, or fix the source. See flags above.`);
+  console.error(`\n${bad.length} definition(s) are over ${limitStr} or not valid Swagger 2.0 — split that folder further, trim the collection, or fix the source. See flags above.`);
   process.exit(2);
 }
-console.log(`\n${written.length} connector definition(s) written to ${OUT}/ — all valid Swagger 2.0, all < 1 MB.`);
+console.log(`\n${written.length} connector definition(s) written to ${OUT}/ — all valid Swagger 2.0, all < ${limitStr}.`);
