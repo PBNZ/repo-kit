@@ -17,8 +17,10 @@ const cfg = JSON.parse(readFileSync('connectors.config.json', 'utf8'));
 const LIMIT = cfg.sizeLimitBytes ?? 1048576;
 const limitStr = LIMIT >= 1048576 ? `${+(LIMIT / 1048576).toFixed(2)} MB` : `${Math.round(LIMIT / 1024)} KB`;
 const OUT = cfg.output ?? 'connectors';
-const work = mkdtempSync(join(tmpdir(), 'ppc-')); // unique per run; removed on exit
-process.on('exit', () => { try { rmSync(work, { recursive: true, force: true }); } catch { /* best-effort */ } });
+const work = mkdtempSync(join(tmpdir(), 'ppc-')); // unique per run; removed on exit / interrupt
+const cleanup = () => { try { rmSync(work, { recursive: true, force: true }); } catch { /* best-effort */ } };
+process.on('exit', cleanup);
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { cleanup(); process.exit(1); });
 const warnings = [];
 
 // --- locate + load the committed collection (prefer the documented source/collection.json) ---
@@ -81,12 +83,17 @@ function pmAuthToSwagger(auth) {
 // response's `status` (reason phrase); collections that omit `status` yield a description-less
 // (invalid) response. Backfill a sensible one so the output always validates.
 const REASON = { 200: 'OK', 201: 'Created', 202: 'Accepted', 203: 'Non-Authoritative Information', 204: 'No Content', 206: 'Partial Content', 301: 'Moved Permanently', 302: 'Found', 304: 'Not Modified', 400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found', 405: 'Method Not Allowed', 409: 'Conflict', 422: 'Unprocessable Entity', 429: 'Too Many Requests', 500: 'Internal Server Error', 502: 'Bad Gateway', 503: 'Service Unavailable' };
+const METHODS = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'];
 function fixResponses(sw) {
-  for (const path of Object.values(sw.paths || {}))
-    for (const op of Object.values(path))
+  for (const path of Object.values(sw.paths || {})) {
+    if (!path || typeof path !== 'object') continue;
+    for (const m of METHODS) {
+      const op = path[m];
       if (op && typeof op === 'object' && op.responses)
         for (const [code, r] of Object.entries(op.responses))
           if (r && typeof r === 'object' && !r.description) r.description = REASON[code] || 'Response';
+    }
+  }
 }
 
 // Swagger 2.0 requires (a) every path key to start with "/", and (b) every "{token}" in a path to
@@ -98,8 +105,9 @@ function fixPaths(sw) {
     const pathKey = key.startsWith('/') ? key : '/' + key;
     const tokens = [...pathKey.matchAll(/\{([^}]+)\}/g)].map((m) => m[1]);
     if (tokens.length && item && typeof item === 'object') {
-      for (const op of Object.values(item)) {
-        if (op && typeof op === 'object' && op.responses) {
+      for (const m of METHODS) {
+        const op = item[m];
+        if (op && typeof op === 'object') {
           op.parameters = op.parameters || [];
           for (const t of tokens)
             if (!op.parameters.some((p) => p.in === 'path' && p.name === t))
@@ -154,10 +162,17 @@ mkdirSync(OUT, { recursive: true });
 for (const f of readdirSync(OUT)) if (f.endsWith('.swagger.json')) rmSync(join(OUT, f));
 
 const written = [];
+const usedSlugs = new Map();
+function uniqueSlug(name) {
+  const base = slug(name);
+  const n = (usedSlugs.get(base) || 0) + 1;
+  usedSlugs.set(base, n);
+  return n === 1 ? base : `${base}-${n}`; // disambiguate folders that slug to the same name
+}
 function emit(name, sw) {
   let bytes = sizeOf(sw);
   if (bytes >= LIMIT) { strip(sw); bytes = sizeOf(sw); } // last-ditch shrink for an oversize def
-  const file = join(OUT, `${slug(name)}.swagger.json`);
+  const file = join(OUT, `${uniqueSlug(name)}.swagger.json`);
   writeFileSync(file, JSON.stringify(sw, null, 2));
   let valid = true;
   try { execFileSync('swagger-cli', ['validate', file], { stdio: 'pipe' }); }
@@ -171,15 +186,16 @@ if (sizeOf(whole) < LIMIT) {
   emit(collection.info?.name || srcName.replace(/\.json$/, ''), whole);
 } else {
   const roots = collection.item || [];
-  for (const folder of roots.filter((it) => it.item)) {
+  for (const folder of roots.filter((it) => it && it.item)) {
+    const fname = folder.name || 'folder';
     const sub = {
-      info: { ...collection.info, name: `${collection.info?.name || ''} - ${folder.name}`.trim() },
+      info: { ...collection.info, name: `${collection.info?.name || ''} - ${fname}`.trim() },
       variable: rootVars,
       item: folder.item,
     };
-    emit(folder.name, convert(sub, slug(folder.name), folder.auth || rootAuth));
+    emit(fname, convert(sub, slug(fname), folder.auth || rootAuth));
   }
-  const loose = roots.filter((it) => it.request);
+  const loose = roots.filter((it) => it && it.request);
   if (loose.length) {
     const sub = { info: { ...collection.info, name: `${collection.info?.name || ''} - misc` }, variable: rootVars, item: loose };
     emit('misc', convert(sub, 'misc', rootAuth));

@@ -19,5 +19,5 @@ jobs:
       - name: Build the pinned toolchain image
         run: docker build -t ppc-gen .
 
-      - name: Generate + self-validate (fails on invalid Swagger 2.0 or >= 1 MB)
-        run: docker run --rm -v "${{ github.workspace }}:/work" -w /work ppc-gen node scripts/generate.mjs
+      - name: Generate + self-validate (fails on invalid Swagger 2.0 or over the size limit)
+        run: docker run --rm --user "$(id -u):$(id -g)" -v "${{ github.workspace }}:/work" -w /work ppc-gen node scripts/generate.mjs

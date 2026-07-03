@@ -33,6 +33,9 @@ flowchart LR
    docker run --rm -v "${PWD}:/work" {{name}}-gen node scripts/generate.mjs
    ```
 
+   *(On Linux/macOS, add `--user "$(id -u):$(id -g)"` to the `docker run` so the generated files
+   aren't owned by root.)*
+
    It writes `connectors/*.swagger.json` — **one file if the whole collection fits under 1 MB,
    otherwise one per top-level folder**. Every file is validated as Swagger 2.0 and checked < 1 MB;
    the run fails if any definition is invalid or oversize.

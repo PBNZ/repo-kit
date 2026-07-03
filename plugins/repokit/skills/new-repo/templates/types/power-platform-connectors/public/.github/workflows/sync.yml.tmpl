@@ -64,7 +64,7 @@ jobs:
         if: steps.fetch.outputs.changed == 'true'
         run: |
           docker build -t ppc-gen .
-          docker run --rm -v "${{ github.workspace }}:/work" -w /work ppc-gen node scripts/generate.mjs
+          docker run --rm --user "$(id -u):$(id -g)" -v "${{ github.workspace }}:/work" -w /work ppc-gen node scripts/generate.mjs
 
       - name: Open a pull request
         if: steps.fetch.outputs.changed == 'true'
