@@ -90,8 +90,9 @@ make the first commit. Nothing is pushed or published — you do that when you'r
 
 ## Profiles
 
-- **Type — what the repo *is*:** `powershell-module` and `docker-compose` (built out), plus `skill-plugin`,
-  `collection`, `mcp-server`, `app-ts`, `app-python`, `script-collection` (stubs, filled as needed).
+- **Type — what the repo *is*:** `powershell-module`, `docker-compose`, and
+  `power-platform-connectors` (built out), plus `skill-plugin`, `collection`, `mcp-server`,
+  `app-ts`, `app-python`, `script-collection` (stubs, filled as needed).
 - **Tier — ceremony, set by visibility:** **Core** (every repo), **+Public**, **+Published**.
 
 See [`the standard`](plugins/repokit/skills/repo-standard/standard/the-standard.md) for the full

@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `docker-compose` repo type for `/new-repo`: a minimal `compose.yaml` (named volumes for data,
   committed config, `.env` secrets), `.env.example`, `.dockerignore`, a README with a workflow
   diagram, and a `docker compose config -q` validation CI (Public tier).
+- A `power-platform-connectors` repo type for `/new-repo`: turns a committed Postman collection
+  into **OpenAPI 2.0** custom-connector definitions for Microsoft Power Platform. A pinned-Docker
+  generator (`postman-to-openapi` + `api-spec-converter`, normalised to valid Swagger 2.0) splits
+  per top-level folder **only when a single definition would exceed the 1 MB limit**, self-validates
+  every output, and a scheduled sync workflow opens a PR when the upstream collection changes. The
+  collection is committed, so the repo builds with just Docker — no Postman account.
 - The `repo-standard` skill now tells agents to check the remote after a push/PR — CI/Actions status and GitHub Copilot / reviewer feedback — before calling work done.
 
 ### Changed

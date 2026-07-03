@@ -1,0 +1,105 @@
+name: sync-postman
+
+# Detect changes to the upstream Postman collection and open a PR with regenerated
+# connector definitions. Account-free when `sourceUrl` is a public URL; add a
+# POSTMAN_API_KEY secret only if the collection lives inside Postman's platform.
+#
+# Requires: Settings -> Actions -> "Allow GitHub Actions to create and approve pull requests".
+
+on:
+  schedule:
+    - cron: '17 6 * * *'   # daily, 06:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: sync-postman
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch upstream collection and detect a change
+        id: fetch
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+        run: |
+          set -euo pipefail
+          URL=$(jq -r '.sourceUrl // ""' connectors.config.json)
+          case "$URL" in
+            *"<fill me"* | "" | null)
+              echo "sourceUrl is not set in connectors.config.json — skipping."
+              echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0;;
+          esac
+          # Send the Postman API key only to a genuine Postman API host (all three verified official:
+          # api.getpostman.com legacy, api.postman.com standard, api.eu.postman.com EU data
+          # residency). The trailing "/" anchors each match so a look-alike like
+          # api.getpostman.com.evil.tld cannot match. --max-redirs 0 fails closed if a host ever
+          # 3xx-redirects: curl re-sends custom headers across hosts on redirect, so this prevents
+          # the key leaking to another host.
+          AUTH=()
+          case "$URL" in
+            "https://api.getpostman.com/"* | "https://api.postman.com/"* | "https://api.eu.postman.com/"*)
+              [ -n "${POSTMAN_API_KEY:-}" ] && AUTH=(--max-redirs 0 -H "X-Api-Key: ${POSTMAN_API_KEY}");;
+          esac
+          curl -fsSL --proto '=https' --proto-redir '=https' --max-time 60 --retry 3 "${AUTH[@]}" "$URL" -o /tmp/fetched.json
+          # Unwrap the Postman API's {"collection": …} envelope if present.
+          if jq -e '.collection' /tmp/fetched.json >/dev/null 2>&1; then
+            jq '.collection' /tmp/fetched.json > /tmp/coll.json
+          else
+            cp /tmp/fetched.json /tmp/coll.json
+          fi
+          NEW=$(jq -S 'del(.info._postman_id)' /tmp/coll.json | sha256sum | cut -d' ' -f1)
+          OLD=$(jq -r '.sha256 // ""' .postman/manifest.json 2>/dev/null || echo "")
+          if [ "$NEW" = "$OLD" ]; then
+            echo "No upstream change."
+            echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          # Write to the canonical committed path (the generator prefers source/collection.json).
+          mkdir -p source .postman
+          cp /tmp/coll.json source/collection.json
+          # No timestamp in the committed manifest — an unchanged collection would otherwise produce
+          # a fresh commit every day. Only sha256 gates change detection.
+          jq -n --arg u "$URL" --arg s "$NEW" '{sourceUrl:$u, sha256:$s}' > .postman/manifest.json
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Regenerate + validate INLINE
+        # Inline because a PR opened by the default GITHUB_TOKEN does not trigger ci.yml,
+        # so we can't rely on CI validating this bot's PR.
+        if: steps.fetch.outputs.changed == 'true'
+        run: |
+          docker build -t ppc-gen .
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -v "${{ github.workspace }}:/work" -w /work ppc-gen node scripts/generate.mjs
+
+      - name: Open a pull request
+        if: steps.fetch.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Reuse one branch/PR so daily runs update the existing PR instead of piling up new ones.
+          BR="sync/postman"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BR"
+          # Stage only the sync outputs, not any other tree state the runner may have.
+          git add source/collection.json .postman/manifest.json connectors/
+          git commit -m "chore: sync connector definitions from upstream Postman collection"
+          git push -f -u origin "$BR"
+          # Open a PR only if one isn't already OPEN for this branch. Use `gh pr list` (open PRs
+          # only), NOT `gh pr view` — the latter returns the branch's most recent PR even when it is
+          # merged/closed, so after the first sync PR merges we'd wrongly think one still exists and
+          # never open another. Command substitution under `set -e` still fails loudly if gh errors
+          # (e.g. "GitHub Actions is not permitted to create pull requests") — a dead sync must be visible.
+          OPEN=$(gh pr list --head "$BR" --state open --json number --jq 'length')
+          if [ "${OPEN:-0}" -eq 0 ]; then
+            gh pr create --base main --head "$BR" \
+              --title "Sync connector definitions from upstream Postman collection" \
+              --body "The upstream Postman collection changed. Regenerated OpenAPI 2.0 definitions (validated as Swagger 2.0, each < 1 MB). **Review before importing to Power Platform** — the Postman-to-2.0 conversion is lossy."
+          fi
