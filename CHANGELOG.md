@@ -25,6 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The plugin now displays as `repo-kit` in the `/plugin` UI (via `displayName`), matching the marketplace name.
 - `/new-repo` now sets a repo-local commit identity using the GitHub noreply email by default (so a new repo doesn't leak a personal address) and initialises the default branch as `main`.
 
+### Fixed
+
+- Two bundled template files existed only in the author's working tree — a global gitignore
+  (`*private*` and env patterns) had silently kept them out of git, so fresh clones and installed
+  copies scaffolded incomplete repos: `powershell-module/core/Private/.gitkeep` (#2) and
+  `docker-compose/core/.env.example`. Both are now tracked, and the repo's `.gitignore` un-ignores
+  everything under the bundled `templates/` tree so this cannot recur.
+
 ## [0.1.0] - 2026-06-21
 
 ### Added
