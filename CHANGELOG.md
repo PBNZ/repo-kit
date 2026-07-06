@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-06
+
 ### Added
 
 - A `docker-compose` repo type for `/new-repo`: a minimal `compose.yaml` (named volumes for data,
@@ -19,11 +21,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every output, and a scheduled sync workflow opens a PR when the upstream collection changes. The
   collection is committed, so the repo builds with just Docker — no Postman account.
 - The `repo-standard` skill now tells agents to check the remote after a push/PR — CI/Actions status and GitHub Copilot / reviewer feedback — before calling work done.
+- A `where-things-go.md` placement guide in the `repo-standard` skill: "I have X — where does it
+  go, how do I create the place if it's missing, and on what convention?"
+- A naming-conventions section in the standard: which casing each convention-bearing file and
+  directory follows, and why (match the ecosystem that owns the name).
+- `README.md` documents the [`PBNZ/pbnz-skills`](https://github.com/PBNZ/pbnz-skills) marketplace
+  listing as an alternative install channel; this repo remains the canonical home (ADR-0004).
 
 ### Changed
 
 - The plugin now displays as `repo-kit` in the `/plugin` UI (via `displayName`), matching the marketplace name.
 - `/new-repo` now sets a repo-local commit identity using the GitHub noreply email by default (so a new repo doesn't leak a personal address) and initialises the default branch as `main`.
+- `category` moved from `plugin.json` to the marketplace entry — Claude Code reads it from the
+  marketplace manifest, not the plugin manifest (flagged by `claude plugin validate`).
+
+### Fixed
+
+- Two bundled template files existed only in the author's working tree — a global gitignore
+  (`*private*` and env patterns) had silently kept them out of git, so fresh clones and installed
+  copies scaffolded incomplete repos: `powershell-module/core/Private/.gitkeep` (#2) and
+  `docker-compose/core/.env.example`. Both are now tracked, and the repo's `.gitignore` un-ignores
+  everything under the bundled `templates/` tree so this cannot recur.
+- The `powershell-module` manifest template now matches the type's modern-PowerShell-only tooling
+  (pwsh CI, `Publish-PSResource`): `PowerShellVersion = '7.0'`, `CompatiblePSEditions = @('Core')`,
+  plus a hint to add the Gallery's compatibility tags (`PSEdition_Core` + OS tags) before
+  publishing (#3).
 
 ## [0.1.0] - 2026-06-21
 
@@ -36,5 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Templates for the **Core**, **Public**, and **Published** tiers, plus the
   **powershell-module** type overlay. The other types ship as stubs.
 
-[Unreleased]: https://github.com/PBNZ/repo-kit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/PBNZ/repo-kit/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/PBNZ/repo-kit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/PBNZ/repo-kit/releases/tag/v0.1.0

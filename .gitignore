@@ -14,3 +14,9 @@ __pycache__/
 release-assets/
 *.nupkg
 node_modules/
+
+# Bundled scaffolding templates are payload, never local cruft: a GLOBAL gitignore
+# may match template filenames (a `*private*` rule ate powershell-module's
+# Private/.gitkeep; env rules ate docker-compose's .env.example). This repo-level
+# negation outranks the global file so template files always stay tracked.
+!plugins/repokit/skills/new-repo/templates/**

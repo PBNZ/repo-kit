@@ -1,10 +1,11 @@
 @{
-    RootModule        = '{{ModuleName}}.psm1'
-    ModuleVersion     = '0.1.0'  # x-release-please-version
-    GUID              = '{{Guid}}'
-    Author            = '{{author}}'
-    Description       = '{{description}}'
-    PowerShellVersion = '5.1'
+    RootModule           = '{{ModuleName}}.psm1'
+    ModuleVersion        = '0.1.0'  # x-release-please-version
+    GUID                 = '{{Guid}}'
+    Author               = '{{author}}'
+    Description          = '{{description}}'
+    PowerShellVersion    = '7.0'
+    CompatiblePSEditions = @('Core')
 
     # List the Public/ functions you want exported (explicit — no wildcards).
     FunctionsToExport = @()
@@ -14,7 +15,9 @@
 
     PrivateData = @{
         PSData = @{
-            # Fill these before publishing to the PowerShell Gallery.
+            # Fill these before publishing to the PowerShell Gallery. For the
+            # Gallery's compatibility filters, tag the edition and OS you support,
+            # e.g. 'PSEdition_Core', 'Windows', 'Linux', 'macOS'.
             Tags         = @()
             LicenseUri   = ''
             ProjectUri   = ''
