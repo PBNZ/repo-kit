@@ -39,3 +39,22 @@ jobs:
 
       - name: Scan SKILL.md bodies for safety issues
         run: python scripts/check_skill_safety.py
+
+  smoke-powershell-module:
+    name: Smoke-test powershell-module templates (pwsh on Linux)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer and Pester
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          Install-Module Pester -Force -Scope CurrentUser
+
+      - name: Stamp templates and verify the module works
+        run: ./scripts/smoke_test_powershell_module.ps1

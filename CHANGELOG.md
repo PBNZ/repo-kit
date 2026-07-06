@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A cross-platform smoke test for the `powershell-module` templates
+  (`scripts/smoke_test_powershell_module.ps1`): stamps the core-tier templates with dummy values
+  and verifies the result parses (`Test-ModuleManifest`), imports, lints clean (PSScriptAnalyzer),
+  and passes its Pester scaffold. CI runs it with pwsh on `ubuntu-latest`, so the templates are now
+  exercised on Linux for every push/PR (ADR-0005).
+
+### Changed
+
+- The `{{Guid}}` placeholder instruction in `/new-repo` is now shell-agnostic (`uuidgen`, pwsh, or
+  python) instead of assuming PowerShell is available on the scaffolding host.
+
 ## [0.2.0] - 2026-07-06
 
 ### Added
