@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The `{{Guid}}` placeholder instruction in `/new-repo` is now shell-agnostic (`uuidgen`, pwsh, or
   python) instead of assuming PowerShell is available on the scaffolding host.
+- GitHub Actions pinned in this repo's CI and in the bundled workflow templates are bumped off the
+  deprecated Node 20 runtime to their latest majors: `actions/checkout@v7`,
+  `actions/setup-python@v6`, and `googleapis/release-please-action@v5` (whose only breaking change
+  is the Node 24 move — no input changes).
 
 ## [0.2.0] - 2026-07-06
 
