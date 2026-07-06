@@ -3,13 +3,12 @@
   "name": "repokit",
   "displayName": "repo-kit",
   "description": "Scaffold standard-compliant repos with /new-repo, and apply the RepoKit standard (conventions + pre-commit/pre-PR checklists) while working in any compliant repo.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "PBNZ"
   },
   "homepage": "https://github.com/PBNZ/repo-kit",
   "repository": "https://github.com/PBNZ/repo-kit",
   "license": "Apache-2.0",
-  "keywords": ["scaffolding", "repo-standard", "templates", "conventional-commits", "agent-skills"],
-  "category": "productivity"
+  "keywords": ["scaffolding", "repo-standard", "templates", "conventional-commits", "agent-skills"]
 }

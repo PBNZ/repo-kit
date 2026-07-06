@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-06
+
 ### Added
 
 - A `docker-compose` repo type for `/new-repo`: a minimal `compose.yaml` (named volumes for data,
@@ -30,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The plugin now displays as `repo-kit` in the `/plugin` UI (via `displayName`), matching the marketplace name.
 - `/new-repo` now sets a repo-local commit identity using the GitHub noreply email by default (so a new repo doesn't leak a personal address) and initialises the default branch as `main`.
+- `category` moved from `plugin.json` to the marketplace entry — Claude Code reads it from the
+  marketplace manifest, not the plugin manifest (flagged by `claude plugin validate`).
 
 ### Fixed
 
@@ -54,5 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Templates for the **Core**, **Public**, and **Published** tiers, plus the
   **powershell-module** type overlay. The other types ship as stubs.
 
-[Unreleased]: https://github.com/PBNZ/repo-kit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/PBNZ/repo-kit/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/PBNZ/repo-kit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/PBNZ/repo-kit/releases/tag/v0.1.0
