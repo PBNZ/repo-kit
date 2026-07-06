@@ -17,7 +17,7 @@ jobs:
     name: generate + validate connector definitions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the pinned toolchain image
         run: docker build -t ppc-gen .

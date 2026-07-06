@@ -17,7 +17,7 @@ jobs:
       # bumps the version, updates CHANGELOG.md, tags, and creates a GitHub release.
       # (Releases created by the default token don't trigger other workflows; if you
       # need the publish workflow to fire on release, supply a PAT via `token:`.)
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
