@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   copies scaffolded incomplete repos: `powershell-module/core/Private/.gitkeep` (#2) and
   `docker-compose/core/.env.example`. Both are now tracked, and the repo's `.gitignore` un-ignores
   everything under the bundled `templates/` tree so this cannot recur.
+- The `powershell-module` manifest template now matches the type's modern-PowerShell-only tooling
+  (pwsh CI, `Publish-PSResource`): `PowerShellVersion = '7.0'`, `CompatiblePSEditions = @('Core')`,
+  plus a hint to add the Gallery's compatibility tags (`PSEdition_Core` + OS tags) before
+  publishing (#3).
 
 ## [0.1.0] - 2026-06-21
 
