@@ -19,7 +19,7 @@
 | Token | How to compute |
 |-------|----------------|
 | `{{year}}` | the current year |
-| `{{Guid}}` | a **fresh** GUID per repo — run `[guid]::NewGuid()` (PowerShell) or equivalent. Never reuse a literal GUID; a hardcoded one would collide across every scaffolded module. |
+| `{{Guid}}` | a **fresh** GUID per repo — use whatever the host offers: `uuidgen` (Linux/macOS), `[guid]::NewGuid()` (pwsh), or `python3 -c "import uuid; print(uuid.uuid4())"`. Never reuse a literal GUID; a hardcoded one would collide across every scaffolded module. |
 | `{{START_HERE_MAP}}` | the where-things-live table you build in step 4 from the resolved file set |
 
 ## Post-scaffold self-check
