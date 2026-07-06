@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every output, and a scheduled sync workflow opens a PR when the upstream collection changes. The
   collection is committed, so the repo builds with just Docker — no Postman account.
 - The `repo-standard` skill now tells agents to check the remote after a push/PR — CI/Actions status and GitHub Copilot / reviewer feedback — before calling work done.
+- A `where-things-go.md` placement guide in the `repo-standard` skill: "I have X — where does it
+  go, how do I create the place if it's missing, and on what convention?"
+- A naming-conventions section in the standard: which casing each convention-bearing file and
+  directory follows, and why (match the ecosystem that owns the name).
+- `README.md` documents the [`PBNZ/pbnz-skills`](https://github.com/PBNZ/pbnz-skills) marketplace
+  listing as an alternative install channel; this repo remains the canonical home (ADR-0004).
 
 ### Changed
 

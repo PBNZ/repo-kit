@@ -79,6 +79,13 @@ flowchart LR
 /reload-plugins
 ```
 
+RepoKit is also listed in the [`PBNZ/pbnz-skills`](https://github.com/PBNZ/pbnz-skills)
+marketplace (a directory of PBNZ plugins); if you already have that marketplace added:
+
+```text
+/plugin install repokit@pbnz-skills
+```
+
 Then scaffold a repo:
 
 ```text
