@@ -1,0 +1,25 @@
+# Runbook — {{name}}
+
+> **Rules for this file** (living docs — see the `repo-standard` skill's `standard/living-docs.md`):
+> current state only — when something changes, replace the old text; git keeps the history.
+> Volatile facts come from `docs/STATE.json` via state blocks — edit the JSON, then run
+> `pwsh scripts/check-docs.ps1 -Update`; never edit between the markers by hand. Dated journal
+> entries go to `CHANGELOG.md`, not here. Formatting per `standard/doc-style.md`: one table
+> style, `YYYY-MM-DD` dates, fixed status words (`PLANNED / IN PROGRESS / BLOCKED / DONE`,
+> `OK / DEGRADED / DOWN`).
+
+## Dashboard
+
+<!-- state:begin keys=overall_status,live_resources -->
+<!-- state:end -->
+
+## Example area — current state
+
+<!-- Copy this section once per operational area (a service, a pipeline, a migration wave).
+     Describe how it works NOW and how to operate it. Prefer a state block over a hand-written
+     date; at most one as-of date per section. Delete this example section once you have a
+     real one. -->
+
+## Reference
+
+<!-- Stable commands, queries, and links that rarely change. -->

@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A **living-docs add-on** for `/new-repo` (opt-in, orthogonal to type and tier): volatile shared
+  facts live once in `docs/STATE.json`, `README.md`/`docs/**/*.md` render them via marker-delimited
+  state blocks, and a cross-platform `scripts/check-docs.ps1` (pwsh 7) enforces consistency —
+  blocks match the state file, no stale/future `as_of` dates, no superseded-content markers in the
+  runbook, one table-separator style — locally and in a Core-tier `docs.yml` workflow. Stamps a
+  current-state-only `docs/RUNBOOK.md` skeleton and adds living-docs ground rules to the scaffolded
+  `AGENTS.md` (ADR-0006).
+- Two new `repo-standard` docs: `standard/living-docs.md` (the pattern, plus an
+  adopt-in-an-existing-repo recipe) and `standard/doc-style.md` (deterministic doc formatting —
+  one table style, ISO dates, fixed status words — so many sessions/models write like one author).
+  The pre-commit / pre-PR checklists gain matching doc-consistency steps.
+- A smoke test for the add-on (`scripts/smoke_test_living_docs.ps1`): stamps the templates,
+  renders the state blocks, and proves the check *fails* on each enforced problem class (drifted
+  block, stale date, superseded marker, malformed table separator). CI runs it on `ubuntu-latest`.
+
 - A cross-platform smoke test for the `powershell-module` templates
   (`scripts/smoke_test_powershell_module.ps1`): stamps the core-tier templates with dummy values
   and verifies the result parses (`Test-ModuleManifest`), imports, lints clean (PSScriptAnalyzer),

@@ -45,7 +45,7 @@ Get-ChildItem -Path $templateRoot -Recurse -File | ForEach-Object {
 }
 
 Write-Host "`nCheck 1: no leftover placeholder tokens"
-$tokenPattern = '\{\{(name|description|author|year|license|type|tier|ModuleName|Guid|START_HERE_MAP)\}\}'
+$tokenPattern = '\{\{(name|description|author|year|today|license|type|tier|ModuleName|Guid|START_HERE_MAP|LIVING_DOCS_RULES)\}\}'
 $leftovers = Get-ChildItem -Path $stageDir -Recurse -File | Select-String -Pattern $tokenPattern
 if ($leftovers) {
     $leftovers | ForEach-Object { Write-Host "  LEFTOVER: $_" }

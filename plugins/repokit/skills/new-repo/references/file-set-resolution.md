@@ -18,6 +18,23 @@ So visibility decides **how many tiers** turn on; the type contributes an overla
 active tier**. A `private` repo gets only `core` (base + type-core). A `published` repo gets all
 three base tiers plus all three type-overlay tiers.
 
+## Add-ons — orthogonal to type and tier
+
+An **add-on** is an opt-in overlay chosen in the interview (currently only `living-docs`). For
+each chosen add-on:
+
+```
+file_set ∪= templates/addons/<addon>/<t>/**   for each active tier t
+```
+
+Add-ons **only add files** — an add-on template must never produce a target path that a base or
+type template also produces, so add-ons need no precedence rule. (If you ever author one that
+collides, that's a bug in the add-on, not a resolution question.)
+
+Deliberate exception to "CI ships at the Public tier": the `living-docs` add-on ships its
+`docs.yml` check workflow at **core**, because deterministic doc-consistency enforcement is the
+add-on's entire point — including, especially, in a private repo (see ADR-0006).
+
 ## Precedence — higher tier wins, then type overlay wins
 
 If the same target path is produced by more than one template, pick a single winner (you never

@@ -20,6 +20,10 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
 - `standard/pre-commit-checklist.md` — run through this before every commit.
 - `standard/pre-pr-checklist.md` — run through this before opening a PR.
 - `standard/testing-matrix.md` — what to test, per repo type.
+- `standard/doc-style.md` — deterministic formatting rules for docs (one table style, ISO dates,
+  fixed status words) so many sessions/models write like one author.
+- `standard/living-docs.md` — the living-docs add-on: `docs/STATE.json` as the single source for
+  volatile facts, state blocks, `scripts/check-docs.ps1`, and the current-state-only runbook rules.
 
 ## The core, inline
 
@@ -34,6 +38,8 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
   offer to add a row (or write an ADR) so it's captured.
 - **Conventional Commits**, one concern per PR. Update `CHANGELOG.md` under `## [Unreleased]` for
   user-visible changes.
+- **Living-docs repos** (the repo has `docs/STATE.json`): volatile facts live there and *only*
+  there — docs move together in the same commit, and `pwsh scripts/check-docs.ps1` must pass.
 - **Ceremony scales by visibility** (Core → +Public → +Published). Don't add public/published
   governance to a private repo.
 - Before committing or opening a PR, run the relevant checklist above.

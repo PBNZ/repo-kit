@@ -58,3 +58,16 @@ jobs:
 
       - name: Stamp templates and verify the module works
         run: ./scripts/smoke_test_powershell_module.ps1
+
+  smoke-living-docs:
+    name: Smoke-test living-docs add-on (pwsh on Linux)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Stamp the add-on and verify check-docs enforces
+        run: ./scripts/smoke_test_living_docs.ps1
