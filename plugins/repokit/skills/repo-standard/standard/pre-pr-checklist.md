@@ -8,6 +8,9 @@ Run through this before opening a pull request.
 - [ ] **The PR template is filled in** (what & why + the checklist).
 - [ ] **One concern per PR** — split unrelated changes.
 - [ ] **`CHANGELOG.md`** has the user-visible changes under `## [Unreleased]`.
+- [ ] **Doc consistency** *(living-docs repos)* — `pwsh scripts/check-docs.ps1` passes, and the
+  runbook is current-state-only: no superseded sections, no dated journal prose (see
+  `living-docs.md`).
 
 ## After a push or PR — check the remote
 

@@ -19,8 +19,10 @@
 | Token | How to compute |
 |-------|----------------|
 | `{{year}}` | the current year |
+| `{{today}}` | the current date, `YYYY-MM-DD` |
 | `{{Guid}}` | a **fresh** GUID per repo — use whatever the host offers: `uuidgen` (Linux/macOS), `[guid]::NewGuid()` (pwsh), or `python3 -c "import uuid; print(uuid.uuid4())"`. Never reuse a literal GUID; a hardcoded one would collide across every scaffolded module. |
 | `{{START_HERE_MAP}}` | the where-things-live table you build in step 4 from the resolved file set |
+| `{{LIVING_DOCS_RULES}}` | living-docs add-on **on**: the verbatim rules block from `references/living-docs-rules.md`; add-on **off**: delete the placeholder line entirely |
 
 ## Post-scaffold self-check
 
@@ -33,7 +35,7 @@ Do **not** grep for a bare `{{` — GitHub Actions expressions like `${{ secrets
 workflow templates are legitimate and must not be flagged. Grep only for the known tokens:
 
 ```
-rg -n '\{\{(name|description|author|year|license|type|tier|ModuleName|Guid|START_HERE_MAP)\}\}' <new-repo-dir>
+rg -n '\{\{(name|description|author|year|today|license|type|tier|ModuleName|Guid|START_HERE_MAP|LIVING_DOCS_RULES)\}\}' <new-repo-dir>
 ```
 
 Any hit is a failure — report the file and line, fix the substitution, and re-run.

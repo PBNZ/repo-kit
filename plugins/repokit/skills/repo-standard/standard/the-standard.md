@@ -81,6 +81,15 @@ pre-create empty directories. When the docs grow substantial, a proven split is
 `docs/explanation/`, plus a `docs/README.md` index and `docs/assets/` for images. Adopt it when
 you have docs to organise, not before.
 
+### Living docs (opt-in add-on)
+
+If the repo's docs track **live operational state** (deployed resources, running jobs, milestone
+status), adopt the **living-docs add-on**: volatile shared facts live once in `docs/STATE.json`,
+README/runbook render them via marker blocks, and `scripts/check-docs.ps1` (+ a `docs.yml`
+workflow) enforces consistency deterministically. `/new-repo` offers it at scaffold time; see
+[`living-docs.md`](living-docs.md) for the pattern and the adopt-in-an-existing-repo recipe, and
+[`doc-style.md`](doc-style.md) for the formatting rules every repo's docs should follow.
+
 ## Naming conventions
 
 RepoKit does **not** impose a single uniform casing. Each name follows the convention of the
@@ -124,3 +133,5 @@ a script from a private collection into a public collection repo is a **copy, no
 - **Do** keep private repos at Core. **Don't** force public/published governance onto them.
 - **Do** record notable decisions as ADRs. **Don't** rely on commit messages alone for rationale.
 - **Do** keep `SKILL.md` files and templates as plain prose — no secrets, no email addresses.
+- **Do** delete superseded doc content — git keeps the history. **Don't** keep "superseded by v2"
+  annotations or before/after duplicates in living docs (see `living-docs.md`).

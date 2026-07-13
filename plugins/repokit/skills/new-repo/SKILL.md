@@ -31,6 +31,10 @@ Gather these from the user's arguments / message, else ask — keep it to load-b
 - **visibility** — `private` (= Core tier), `public` (= +Public), or `published` (= +Published).
 - **author** — default `Peter Braun` (`PBNZ`).
 - **license** — default `Apache-2.0`.
+- **living-docs add-on** — yes/no, default **no**. Ask: *"Will this repo's docs track live
+  operational state (deployed resources, scheduled jobs, long-running migrations)?"* If yes, the
+  add-on stamps `docs/RUNBOOK.md`, `docs/STATE.json`, `scripts/check-docs.ps1`, and a `docs.yml`
+  check workflow (see `references/living-docs-rules.md`).
 - For `powershell-module` only: **ModuleName** (PascalCase, e.g. `MyModule`).
 
 If the chosen type is a **stub** (anything other than `powershell-module`, `docker-compose`, or `power-platform-connectors`), tell the user so: the
@@ -42,7 +46,9 @@ want to continue.
 1. **Resolve the file set** (see `references/file-set-resolution.md`).
    `active_tiers = [core] + ([public] if visibility in {public, published}) + ([published] if visibility == published)`.
    The file set is the union, over each active tier `t`, of everything under `templates/<t>/` and
-   everything under `templates/types/<type>/<t>/`. On a path collision pick one winner: **higher
+   everything under `templates/types/<type>/<t>/` — plus, for each chosen add-on, everything
+   under `templates/addons/<addon>/<t>/` (add-ons only add files; they never collide). On a path
+   collision pick one winner: **higher
    tier wins (`published` > `public` > `core`), then within a tier the type overlay wins**.
    Produce an explicit list of `(template path → target path)` pairs: drop any trailing `.tmpl`,
    and substitute filename placeholders (e.g. `{{ModuleName}}.psd1.tmpl` → `MyModule.psd1`).
@@ -61,6 +67,14 @@ want to continue.
    `repo-standard` skill; CI → `.github/workflows/`; tests → the type's test dir) and substitute it
    into the `{{START_HERE_MAP}}` placeholder in the stamped `AGENTS.md`. Add a one-line pointer in
    the README.
+
+   **Resolve `{{LIVING_DOCS_RULES}}`** in the stamped `AGENTS.md`: with the living-docs add-on
+   on, substitute the verbatim rules block from `references/living-docs-rules.md` and append that
+   file's `## Status` snippet to the stamped `README.md`; with the add-on off, delete the
+   placeholder line entirely. When the add-on is on, finish by running
+   `pwsh scripts/check-docs.ps1 -Update` then `pwsh scripts/check-docs.ps1` inside the new repo
+   (both must succeed); if pwsh 7 is missing on this host, say so in the summary — running it is
+   the user's first task.
 
    **Self-check (gate — both must pass before you continue).** See `references/placeholders.md`:
    (a) no enumerated placeholder tokens remain anywhere in the output; (b) every expected target

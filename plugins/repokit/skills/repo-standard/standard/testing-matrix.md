@@ -16,3 +16,8 @@ minimum, whatever proves the code runs.)
 
 When you fill in a stub type overlay, add its row here and ship a CI workflow in the type's
 `public/` overlay.
+
+Regardless of type: a repo with the **living-docs add-on** additionally runs
+`pwsh scripts/check-docs.ps1` locally (pre-commit) and in CI via its `docs.yml` workflow — this
+ships at the Core tier, because doc-consistency enforcement is the add-on's whole point even in a
+private repo (see `living-docs.md`).

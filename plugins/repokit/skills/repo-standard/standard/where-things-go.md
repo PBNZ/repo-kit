@@ -30,6 +30,9 @@ or when there's no folder for it yet and you need to know where, and how, to cre
 | Application / library source code | the language idiom — `src/` (TS/JS, Python package), the module root for a PowerShell module | per language | language idiom |
 | Tool configuration | the exact path the tool requires (`.editorconfig`, `.gitignore`, `release-please-config.json`, `pyproject.toml`, …) | at that exact path | the tool's docs |
 | A user-visible change to record | `CHANGELOG.md` under `## [Unreleased]` | — | Keep a Changelog |
+| An operational runbook (how the system runs *now*, how to operate it) | `docs/RUNBOOK.md`, current-state-only | adopt the living-docs add-on (`living-docs.md`) | RepoKit living-docs |
+| A volatile shared fact (status, live resource, count, size, as-of date) | `docs/STATE.json`, rendered into docs via state blocks | adopt the living-docs add-on (`living-docs.md`) | RepoKit living-docs |
+| A dated operational journal entry ("checked X on date") | `CHANGELOG.md` (or the commit message) — never the runbook | — | RepoKit living-docs |
 | Secrets / API keys / credentials | **Never in the repo.** Use a gated GitHub Environment secret, or a secrets manager. | n/a | security |
 | (RepoKit dev) a new repo-type's scaffolding | `templates/types/<type>/{core,public,published}/` | create the type overlay | the RepoKit standard |
 
