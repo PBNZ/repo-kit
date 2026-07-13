@@ -10,7 +10,7 @@
       "name": "repokit",
       "source": "./plugins/repokit",
       "description": "Scaffold standard-compliant repos (/new-repo) and apply the repo standard while you work.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "category": "productivity"
     }
   ]

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-13
+
 ### Added
 
 - A **living-docs add-on** for `/new-repo` (opt-in, orthogonal to type and tier): volatile shared
@@ -90,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Templates for the **Core**, **Public**, and **Published** tiers, plus the
   **powershell-module** type overlay. The other types ship as stubs.
 
-[Unreleased]: https://github.com/PBNZ/repo-kit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/PBNZ/repo-kit/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/PBNZ/repo-kit/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/PBNZ/repo-kit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/PBNZ/repo-kit/releases/tag/v0.1.0
