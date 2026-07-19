@@ -79,3 +79,6 @@ Assert-Check 'missing resume-state row fails' $d 1
 
 if ($script:failed -gt 0) { Write-Host "smoke_test_repokit_check: $script:failed failure(s)"; exit 1 }
 Write-Host 'smoke_test_repokit_check: all cases passed'
+# Explicit success exit: the last negative case leaves $LASTEXITCODE = 1, and GitHub's pwsh
+# shell wrapper would otherwise propagate it as the job's exit code.
+exit 0
