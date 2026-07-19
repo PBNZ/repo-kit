@@ -29,7 +29,10 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
 - `standard/labels.md` — the layered issue/PR label scheme: GitHub defaults as the base, opt-in
   namespaces (`area:`, `agent:`, `campaign:`), workflow-verdict labels, and the bootstrap commands.
 - `standard/agent-collaboration.md` — humans + agents on a shared board: the real-time board
-  rule, the pickup/handoff loop, agent-output signatures, and the session preflight.
+  rule, the pickup/handoff loop, closing-force gestures, agent-output signatures, and the
+  session preflight.
+- `standard/fleet.md` — multi-repo projects (hub-and-spoke): the hub as router, the scope test,
+  sibling clones, three-line spoke inheritance, and docs-move-with-stub.
 
 ## The core, inline
 
