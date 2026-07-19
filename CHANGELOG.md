@@ -31,6 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An issue-traceability convention (#14): `Refs #NN` in commits/PRs when the repo tracks issues,
   closing keywords only where merge equals done, the field-tested auto-close CI guard as a
   copy-paste snippet, and a `Refs` prompt in both PR templates.
+- Two more reference docs from the retrospective's day-2 addenda: `standard/fleet.md`
+  (hub-and-spoke conventions for multi-repo projects — the hub as router, the scope test,
+  sibling clones, three-line spoke inheritance, docs-move-with-stub, #19) and
+  `standard/org-migration-checklist.md` (the six platform landmines of a personal-account → org
+  migration as symptom → cause → fix, with GitHub-docs citations, #20).
+- `agent-collaboration.md` addenda (#15): board rules must enumerate which gestures carry
+  closing/destructive force and reserve them for humans (agents never set a card to Done), plus
+  the three-audience task-instruction pattern (agent prompt / GUI links / CLI fallback + shared
+  verify).
 
 ## [0.3.0] - 2026-07-13
 

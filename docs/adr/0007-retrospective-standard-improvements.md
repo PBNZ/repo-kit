@@ -31,9 +31,23 @@ Accept all seven, landed as one batch (one commit per issue, `Refs #NN`):
   test proving it fails on each observed drift case; adoption marker for retro-adopted repos.
 - **#17** `standard/session-end-checklist.md` — six mechanically checkable wrap-up items.
 
+Day-2 addenda, accepted on the same PR:
+
+- **#15 (addenda)** `agent-collaboration.md` gains *Closing force — enumerate the gestures*
+  (agents never set a card to Done; gestures with closing/destructive force are listed and
+  reserved for humans) and the *three-audience task instructions* pattern.
+- **#19** `standard/fleet.md` — hub-and-spoke conventions for multi-repo projects: hub as
+  router, the verbatim scope test, sibling clones, three-line spoke inheritance,
+  docs-move-with-stub; the hub defined as the fleet-hub profile of the `collection` type.
+- **#20** `standard/org-migration-checklist.md` — the six verified platform landmines of a
+  personal-account → org migration, phased, with GitHub-docs citations for the plan-dependent
+  limits (re-verified 2026-07-20).
+
 Adaptations: the optional CI checks in #12/#13 ship as documented opt-in snippets rather than
-scaffold defaults (warn-level noise shouldn't be mandatory at Core), and #11's bootstrap hooks
-into the existing opt-in remote-creation step (labels need a remote).
+scaffold defaults (warn-level noise shouldn't be mandatory at Core), #11's bootstrap hooks
+into the existing opt-in remote-creation step (labels need a remote), and #19's hub scaffolding
+waits for the `collection` type stub to be filled in — the profile is documented so `/new-repo`
+can offer it then.
 
 Issues are **not** auto-closed — the human verifies each after merge (#14's own rule).
 
