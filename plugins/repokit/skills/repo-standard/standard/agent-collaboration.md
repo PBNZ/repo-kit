@@ -26,6 +26,39 @@ The default protocol for working a card:
    [`commit-conventions.md`](commit-conventions.md)) or applies `rework` / `needs-respec` and
    sends it back.
 
+## Closing force — enumerate the gestures
+
+Board automations can give a plain gesture side effects: with "auto-close issue when status =
+Done" enabled alongside "item closed → Done", the Done column is **bidirectional** — dragging a
+card to Done closes the issue. That collides with "closing is human-only" the moment an agent
+moves cards via API, which the pickup/handoff loop requires it to do.
+
+So the repo's agent rules must, wherever board automations are enabled:
+
+1. **List explicitly which gestures carry side effects** (which status changes close, reopen,
+   or auto-move anything), and
+2. **Reserve the gestures with closing or destructive force for humans.**
+
+Keep the automations — a human's drag to Done is a legitimate verify gesture. The default hard
+rule that makes it safe: **agents never set a card's status to Done — not by drag, not via
+API.** Agents stop at the review column (step 3 of the loop); Done is the human's move.
+
+## Three-audience task instructions
+
+Task issues addressed to collaborators with mixed CLI comfort work best written as three
+parallel options plus one shared verify section:
+
+- **Option A — "tell your agent":** a ready-to-paste prompt for the collaborator's coding
+  agent. In practice the easiest path, and it makes the agent-file conventions self-reinforcing.
+- **Option B — GUI clicks:** the pure point-and-click route (web UI, GitHub Desktop), with
+  real links instead of code-formatted names — every repo, board, and file mentioned should be
+  clickable.
+- **Option C — CLI fallback:** the exact commands, code-fenced, for whoever prefers them.
+- **Verify (shared):** observable checks that hold regardless of the option taken.
+
+Formatting rule of thumb: code formatting only for genuine paste-material (commands, literal
+values); markdown links for everything navigable.
+
 ## Signatures on agent output
 
 Agent-authored issues, comments, and reviews end with a signature so provenance is never
