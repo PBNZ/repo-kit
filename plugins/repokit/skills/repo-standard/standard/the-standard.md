@@ -145,6 +145,37 @@ look uniform.
 Private → public → published just **switches on the next layer** over the *same* structure. Moving
 a script from a private collection into a public collection repo is a **copy, not a rewrite**.
 
+## Variance declarations
+
+The standard tolerates variants by design — ceremony scales by tier, and a README-status
+contract can genuinely beat a checkpoint file. What it does not tolerate is *silent* variance:
+
+- **Any deviation from the tier's file set** — a substitute file, a relocated file, an omitted
+  component — **must have a row in the START-HERE map** saying what replaces what (e.g.
+  "Changelog → `docs/history/CHANGELOG.md`", "Resume state → README `## Status` contract").
+- **Undeclared deviation is non-compliance. Declared deviation is a variant.** Every deviation
+  in a compliant repo is visible from the START-HERE map alone — no archaeology.
+
+**The self-check.** `scripts/repokit-check.ps1` (stamped by `/new-repo` at Core; retrofittable
+by copying the file) verifies the declared structure actually exists, in seconds: canonical
+agent file + thin shim present and the shim imports it, every START-HERE path resolves, and the
+changelog / ADR dir / resume-state artifact exist at their declared (or default) locations. Run
+it locally before a release, or add one CI line:
+
+```yaml
+- name: RepoKit self-check
+  shell: pwsh
+  run: ./scripts/repokit-check.ps1
+```
+
+**Adoption marker — retro-adopted repos.** A repo that adopts the standard mid-life snaps to the
+conventions at the adoption commit; nothing before it should ever be re-flagged by an audit.
+Declare the compliance horizon with one line in `AGENTS.md`, right under the START-HERE map:
+
+```text
+RepoKit adopted: 2026-07-19 (`<short-sha>`) — history before this commit predates the standard.
+```
+
 ## Publish profiles
 
 - **Registry-backed** (PSGallery, npm): `release-please` bumps the version (via a version-line

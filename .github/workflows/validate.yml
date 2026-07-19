@@ -59,6 +59,28 @@ jobs:
       - name: Stamp templates and verify the module works
         run: ./scripts/smoke_test_powershell_module.ps1
 
+  self-check:
+    name: RepoKit compliance self-check (dogfood)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Run repokit-check against this repo
+        shell: pwsh
+        run: ./plugins/repokit/skills/new-repo/templates/core/scripts/repokit-check.ps1
+
+  smoke-repokit-check:
+    name: Smoke-test repokit-check (pwsh on Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Prove the check passes clean and fails on each drift case
+        shell: pwsh
+        run: ./scripts/smoke_test_repokit_check.ps1
+
   smoke-living-docs:
     name: Smoke-test living-docs add-on (pwsh on Linux)
     runs-on: ubuntu-latest

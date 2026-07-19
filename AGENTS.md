@@ -21,6 +21,7 @@ This repo **dogfoods its own standard** (Core + Public tier).
 | Templates stamped into new repos | `plugins/repokit/skills/new-repo/templates/` |
 | Decisions & rationale (learnings log) | `docs/adr/` |
 | Validation scripts (run before committing) | `scripts/` + `.github/workflows/validate.yml` |
+| Standard-compliance self-check (CI dogfoods it here) | `plugins/repokit/skills/new-repo/templates/core/scripts/repokit-check.ps1` |
 
 ## Ground rules
 

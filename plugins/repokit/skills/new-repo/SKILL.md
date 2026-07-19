@@ -80,7 +80,10 @@ want to continue.
 
    **Self-check (gate — both must pass before you continue).** See `references/placeholders.md`:
    (a) no enumerated placeholder tokens remain anywhere in the output; (b) every expected target
-   file exists and no `.tmpl` suffix survived. If either fails, fix and re-check.
+   file exists and no `.tmpl` suffix survived. If either fails, fix and re-check. Then, when
+   pwsh 7 is available, run `pwsh scripts/repokit-check.ps1` inside the new repo — the stamped
+   compliance self-check must pass (it verifies the shim, the START-HERE paths, and the
+   changelog / ADR / resume-state artifacts); if pwsh is missing, say so in the summary.
 
 5. **Initialise git** in the new repo directory:
    - **Default branch `main`, never `master`:** `git init -b main` (`-b` needs git >= 2.28; if it
