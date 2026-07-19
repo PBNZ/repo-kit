@@ -102,7 +102,10 @@ want to continue.
 
 6. **Offer a private remote — opt-in only.** Ask whether to create a private GitHub repo. Only if
    the user says yes: `gh repo create <name> --private --source . --remote origin`. Never public,
-   never push to a public remote, never publish.
+   never push to a public remote, never publish. When a remote is created, also offer the
+   RepoKit label bootstrap (the workflow-verdict set plus any namespaces the user wants) — the
+   commands are in the `repo-standard` skill's `standard/labels.md`; skip it for repos that won't
+   run an issue board.
 
 7. **Print the summary:** the resolved tier × type, the file tree, the START-HERE map, and next
    steps — "review locally; you publish when ready."

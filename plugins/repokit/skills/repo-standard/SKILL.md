@@ -24,6 +24,8 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
   fixed status words) so many sessions/models write like one author.
 - `standard/living-docs.md` — the living-docs add-on: `docs/STATE.json` as the single source for
   volatile facts, state blocks, `scripts/check-docs.ps1`, and the current-state-only runbook rules.
+- `standard/labels.md` — the layered issue/PR label scheme: GitHub defaults as the base, opt-in
+  namespaces (`area:`, `agent:`, `campaign:`), workflow-verdict labels, and the bootstrap commands.
 
 ## The core, inline
 
