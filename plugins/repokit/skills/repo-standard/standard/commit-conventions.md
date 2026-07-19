@@ -39,6 +39,36 @@ Maintain `CHANGELOG.md` in the [Keep a Changelog](https://keepachangelog.com/en/
 Add user-visible changes under `## [Unreleased]` as you go; on release, rename that section to the
 new version with the date and start a fresh `## [Unreleased]`.
 
+## When to cut a release
+
+`[Unreleased]` is a staging area, not a terminal state — a changelog whose entire history sits
+there stops answering "what's new". Cut a version the **first** time any of these happens:
+
+1. **An artifact leaves the repo** — deployed, published, installed on a second machine, or
+   handed to anyone else.
+2. **A version number is stamped into any output** (a manifest, a UI footer, a generated file).
+3. **A tag pipeline exists and has never fired** — release machinery you built but never
+   triggered is the strongest signal you're overdue.
+
+The pre-PR checklist carries the tripwire: if `[Unreleased]` describes more than one shippable
+unit, cut before it grows further.
+
+**Declared variant — never-versioned repos** (internal ops repos with nothing to version): use
+**dated entries** instead of versions — `## 2026-07-19` sections in Keep-a-Changelog style —
+and declare the variant in the START-HERE map so it reads as a choice, not neglect.
+
+Optional CI nudge (warn, not fail — copy into any workflow):
+
+```yaml
+- name: Warn when [Unreleased] gets fat
+  shell: bash
+  run: |
+    n=$(awk '/^## \[Unreleased\]/{f=1;next} /^## /{f=0} f&&/^- /{c++} END{print c+0}' CHANGELOG.md)
+    if [ "$n" -gt 10 ]; then
+      echo "::warning::CHANGELOG.md [Unreleased] holds $n entries - time to cut a release?"
+    fi
+```
+
 ## Releasing
 
 - **Registry-backed repos** (PSGallery, npm): `release-please` reads your Conventional Commits,
