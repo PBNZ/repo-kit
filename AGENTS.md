@@ -11,6 +11,7 @@ This repo **dogfoods its own standard** (Core + Public tier).
 | You want… | Look in |
 |-----------|---------|
 | What RepoKit is / how to install | `README.md` |
+| Where work was left (resume state / checkpoint) | `docs/CHECKPOINT.md` |
 | The standard itself (tiers, where-things-live, do/don't) | `plugins/repokit/skills/repo-standard/standard/the-standard.md` |
 | Commit / changelog / version conventions | `plugins/repokit/skills/repo-standard/standard/commit-conventions.md` |
 | Pre-commit / pre-PR checklists | `plugins/repokit/skills/repo-standard/standard/pre-commit-checklist.md`, `pre-pr-checklist.md` |

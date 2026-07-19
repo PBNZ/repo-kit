@@ -63,9 +63,11 @@ want to continue.
    choices.
 
 4. **Generate the START-HERE map.** From the resolved file set, build a short "where things live"
-   table (rules → `AGENTS.md`; decisions → `docs/adr/`; conventions & checklists → the
+   table (rules → `AGENTS.md`; decisions → `docs/adr/`; **resume state → `docs/CHECKPOINT.md`**
+   (or `docs/STATE.json` when the living-docs add-on takes over); conventions & checklists → the
    `repo-standard` skill; CI → `.github/workflows/`; tests → the type's test dir) and substitute it
-   into the `{{START_HERE_MAP}}` placeholder in the stamped `AGENTS.md`. Add a one-line pointer in
+   into the `{{START_HERE_MAP}}` placeholder in the stamped `AGENTS.md`. The resume-state row is
+   **mandatory** — `scripts/repokit-check.ps1` fails without it. Add a one-line pointer in
    the README.
 
    **Resolve `{{LIVING_DOCS_RULES}}`** in the stamped `AGENTS.md`: with the living-docs add-on

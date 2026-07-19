@@ -114,6 +114,14 @@ Requires pwsh 7. Scans `README.md` and `docs/**/*.md`; no configuration.
 - Follow [`doc-style.md`](doc-style.md) throughout — one table style, fixed status words,
   ISO dates.
 
+## When a freshness gate goes red, fix the doc — never widen the gate
+
+A failing staleness check means a fact is no longer confirmed true — the correct response is to
+re-confirm the fact and update its `as_of` (or its value). Raising `stale_after_days`, setting it
+to `0`, or loosening any check to make CI green converts the failure into permanent silent
+drift — the exact failure mode this pattern exists to prevent. Widen a gate only when the *fact's
+nature* changed (it became genuinely fixed, e.g. a region id), and say so in the commit message.
+
 ## Docs move together
 
 If a commit changes anything a doc states — status, resources, counts, dates — update

@@ -29,6 +29,9 @@ flowchart TD
 - A **START-HERE map** in `AGENTS.md` — where rules, decisions, checklists, CI, and tests live.
 - `docs/` — all documentation, including `docs/adr/` (the ADR learnings log; `0000-template.md`
   is the template).
+- A **resume-state artifact** — `docs/CHECKPOINT.md` by default, or a declared substitute (a
+  living-docs `docs/STATE.json`, a README-status contract) — with a row in the START-HERE map.
+  See *Resume state* below.
 - `README.md`, `CONTRIBUTING.md` (internal "where things live"), `CHANGELOG.md`.
 - `.gitignore`, `.editorconfig`, `.gitattributes`.
 - Conventional Commits; the `repo-standard` skill applies the conventions and checklists.
@@ -89,6 +92,32 @@ README/runbook render them via marker blocks, and `scripts/check-docs.ps1` (+ a 
 workflow) enforces consistency deterministically. `/new-repo` offers it at scaffold time; see
 [`living-docs.md`](living-docs.md) for the pattern and the adopt-in-an-existing-repo recipe, and
 [`doc-style.md`](doc-style.md) for the formatting rules every repo's docs should follow.
+
+## Resume state (required at Core)
+
+The doc that decays first is the one a fresh session needs first: "where was this repo left, and
+what's the exact next step?" So Core **requires** a resume-state artifact, and the START-HERE map
+**must** have a row pointing at it. The default is `docs/CHECKPOINT.md` (scaffolded by
+`/new-repo`); a living-docs `docs/STATE.json` or a README-status contract are fine substitutes
+**when declared** in the map (see *Variance declarations*).
+
+The artifact's contract, whatever its form:
+
+- a **last-updated** date (`YYYY-MM-DD`), and
+- an **explicit next step** — the exact next command or task, or `paused — nothing pending`.
+
+The pre-commit checklist carries the tripwire ("resume-state updated, or this commit doesn't
+change state — say which"). Optional CI nudge (warn, not fail — copy into any workflow):
+
+```yaml
+- name: Warn when the checkpoint goes stale
+  shell: bash
+  run: |
+    n=$(git rev-list --count "$(git log -1 --format=%H -- docs/CHECKPOINT.md)..HEAD" 2>/dev/null || echo 0)
+    if [ "$n" -gt 15 ]; then
+      echo "::warning::docs/CHECKPOINT.md untouched for $n commits — is the resume state still true?"
+    fi
+```
 
 ## Naming conventions
 
