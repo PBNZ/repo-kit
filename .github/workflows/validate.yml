@@ -59,6 +59,34 @@ jobs:
       - name: Stamp templates and verify the module works
         run: ./scripts/smoke_test_powershell_module.ps1
 
+  no-auto-close:
+    name: Block auto-close keywords
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Reject closing keywords targeting an issue
+        shell: bash
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          pat='\b(close[sd]?|fix(e[sd])?|resolve[sd]?)\b:?[[:space:]]+(#[0-9]+|https://github\.com/[^ ]+/issues/[0-9]+)'
+          fail=0
+          if printf '%s' "$PR_BODY" | grep -qiE "$pat"; then
+            echo "::error::Closing keyword in the PR body - use 'Refs #NN'; a human closes after verifying."
+            fail=1
+          fi
+          if git log "origin/$BASE_REF..HEAD" --format=%B | grep -qiE "$pat"; then
+            echo "::error::Closing keyword in a commit message - use 'Refs #NN'."
+            fail=1
+          fi
+          exit $fail
+
   self-check:
     name: RepoKit compliance self-check (dogfood)
     runs-on: ubuntu-latest
