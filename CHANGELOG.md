@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Three new `repo-standard` reference docs from the workflow retrospective (#10):
+  `standard/labels.md` (layered, opt-in label scheme with fixed namespace colours and a gh
+  bootstrap, #11), `standard/agent-collaboration.md` (real-time board rule, pickup/handoff loop,
+  agent signatures, session preflight, #15), and `standard/session-end-checklist.md` (six
+  mechanically checkable wrap-up items, #17).
+- A **resume-state artifact is now required at Core** (#12): `/new-repo` stamps
+  `docs/CHECKPOINT.md` (last-updated date + explicit next step), the START-HERE map must carry a
+  resume-state row, the pre-commit checklist gains the update-or-say-why tripwire, and the
+  living-docs reference gains the "fix the doc, never widen the gate" rule. This repo dogfoods
+  its own checkpoint.
+- A **compliance self-check** (#16): core-tier `scripts/repokit-check.ps1` verifies the
+  CLAUDE.md shim imports AGENTS.md, every START-HERE path resolves, and the
+  changelog / ADR / resume-state artifacts exist — plus the variance-declaration rule
+  (undeclared deviation = non-compliance) and an adoption marker for retro-adopted repos. CI
+  runs the check against this repo and a smoke test proving it fails on each drift case
+  (ADR-0007).
+- Release-cutting triggers in `commit-conventions.md` (#13): cut when an artifact leaves the
+  repo, a version is stamped into output, or a tag pipeline has never fired; declared
+  dated-entries variant for never-versioned repos; opt-in CI nudge.
+- An issue-traceability convention (#14): `Refs #NN` in commits/PRs when the repo tracks issues,
+  closing keywords only where merge equals done, the field-tested auto-close CI guard as a
+  copy-paste snippet, and a `Refs` prompt in both PR templates.
+- Two more reference docs from the retrospective's day-2 addenda: `standard/fleet.md`
+  (hub-and-spoke conventions for multi-repo projects — the hub as router, the scope test,
+  sibling clones, three-line spoke inheritance, docs-move-with-stub, #19) and
+  `standard/org-migration-checklist.md` (the six platform landmines of a personal-account → org
+  migration as symptom → cause → fix, with GitHub-docs citations, #20).
+- `agent-collaboration.md` addenda (#15): board rules must enumerate which gestures carry
+  closing/destructive force and reserve them for humans (agents never set a card to Done), plus
+  the three-audience task-instruction pattern (agent prompt / GUI links / CLI fallback + shared
+  verify).
+
 ## [0.3.0] - 2026-07-13
 
 ### Added

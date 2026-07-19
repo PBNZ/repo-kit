@@ -11,6 +11,9 @@ Run through this before every commit.
   (status, resources, counts, dates), update `docs/STATE.json` in the same commit, run
   `pwsh scripts/check-docs.ps1 -Update`, and include the re-rendered blocks; the plain check must
   pass (see `living-docs.md`).
+- [ ] **Resume-state updated** — the repo's resume-state artifact (`docs/CHECKPOINT.md` or its
+  declared substitute) reflects this commit, **or** the commit doesn't change the repo's state —
+  say which.
 - [ ] **Conventional Commit message** (see `commit-conventions.md`), one concern per commit.
 
 > Enforcement note: Claude Code hooks only catch commands run *in-session*; a native `git commit`

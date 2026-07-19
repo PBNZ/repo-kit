@@ -63,9 +63,11 @@ want to continue.
    choices.
 
 4. **Generate the START-HERE map.** From the resolved file set, build a short "where things live"
-   table (rules → `AGENTS.md`; decisions → `docs/adr/`; conventions & checklists → the
+   table (rules → `AGENTS.md`; decisions → `docs/adr/`; **resume state → `docs/CHECKPOINT.md`**
+   (or `docs/STATE.json` when the living-docs add-on takes over); conventions & checklists → the
    `repo-standard` skill; CI → `.github/workflows/`; tests → the type's test dir) and substitute it
-   into the `{{START_HERE_MAP}}` placeholder in the stamped `AGENTS.md`. Add a one-line pointer in
+   into the `{{START_HERE_MAP}}` placeholder in the stamped `AGENTS.md`. The resume-state row is
+   **mandatory** — `scripts/repokit-check.ps1` fails without it. Add a one-line pointer in
    the README.
 
    **Resolve `{{LIVING_DOCS_RULES}}`** in the stamped `AGENTS.md`: with the living-docs add-on
@@ -78,7 +80,10 @@ want to continue.
 
    **Self-check (gate — both must pass before you continue).** See `references/placeholders.md`:
    (a) no enumerated placeholder tokens remain anywhere in the output; (b) every expected target
-   file exists and no `.tmpl` suffix survived. If either fails, fix and re-check.
+   file exists and no `.tmpl` suffix survived. If either fails, fix and re-check. Then, when
+   pwsh 7 is available, run `pwsh scripts/repokit-check.ps1` inside the new repo — the stamped
+   compliance self-check must pass (it verifies the shim, the START-HERE paths, and the
+   changelog / ADR / resume-state artifacts); if pwsh is missing, say so in the summary.
 
 5. **Initialise git** in the new repo directory:
    - **Default branch `main`, never `master`:** `git init -b main` (`-b` needs git >= 2.28; if it
@@ -102,7 +107,10 @@ want to continue.
 
 6. **Offer a private remote — opt-in only.** Ask whether to create a private GitHub repo. Only if
    the user says yes: `gh repo create <name> --private --source . --remote origin`. Never public,
-   never push to a public remote, never publish.
+   never push to a public remote, never publish. When a remote is created, also offer the
+   RepoKit label bootstrap (the workflow-verdict set plus any namespaces the user wants) — the
+   commands are in the `repo-standard` skill's `standard/labels.md`; skip it for repos that won't
+   run an issue board.
 
 7. **Print the summary:** the resolved tier × type, the file tree, the START-HERE map, and next
    steps — "review locally; you publish when ready."

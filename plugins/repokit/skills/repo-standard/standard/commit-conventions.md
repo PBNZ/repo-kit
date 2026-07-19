@@ -28,6 +28,53 @@ chore: scaffold my-tool via RepoKit
 **Breaking changes:** append `!` after the type/scope (`feat!: …`) or add a `BREAKING CHANGE:`
 footer. A breaking change bumps the **major** version.
 
+## Issue traceability
+
+When the repo uses an issue tracker, `git log` alone must answer "which issue drove this
+commit" — traceability buried in changelog prose is invisible to every tool.
+
+- Reference the driving issue as **`Refs #NN`** in the commit subject or footer, and in the PR
+  body (the PR template prompts for it).
+- Repos without a tracker are exempt — but don't half-adopt: issue numbers appearing *only* in
+  changelog prose is the worst of both worlds. Either commits carry refs, or the repo doesn't
+  do issue refs at all.
+
+**Closing keywords (`Closes/Fixes/Resolves #NN`) — only where merge genuinely equals done.**
+They auto-close at merge, which silently skips any post-merge human verification step. The
+decision rule: solo repo, no verification after merge → closing keywords are fine. Any human
+verify gate after landing → use `Refs #NN` and let a human close after verifying.
+
+For repos with a verify gate, ship this guard (field-tested — rejects a closing keyword followed
+by an issue reference in the PR body or any commit message):
+
+```yaml
+no-auto-close:
+  name: Block auto-close keywords
+  runs-on: ubuntu-latest
+  if: github.event_name == 'pull_request'
+  steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - name: Reject closing keywords targeting an issue
+      shell: bash
+      env:
+        PR_BODY: ${{ github.event.pull_request.body }}
+        BASE_REF: ${{ github.base_ref }}
+      run: |
+        pat='\b(close[sd]?|fix(e[sd])?|resolve[sd]?)\b:?[[:space:]]+(#[0-9]+|https://github\.com/[^ ]+/issues/[0-9]+)'
+        fail=0
+        if printf '%s' "$PR_BODY" | grep -qiE "$pat"; then
+          echo "::error::Closing keyword in the PR body - use 'Refs #NN'; a human closes after verifying."
+          fail=1
+        fi
+        if git log "origin/$BASE_REF..HEAD" --format=%B | grep -qiE "$pat"; then
+          echo "::error::Closing keyword in a commit message - use 'Refs #NN'."
+          fail=1
+        fi
+        exit $fail
+```
+
 ## SemVer
 
 `MAJOR.MINOR.PATCH` per [semver.org](https://semver.org/spec/v2.0.0.html): breaking → MAJOR,
@@ -38,6 +85,36 @@ new feature → MINOR, fix → PATCH.
 Maintain `CHANGELOG.md` in the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 Add user-visible changes under `## [Unreleased]` as you go; on release, rename that section to the
 new version with the date and start a fresh `## [Unreleased]`.
+
+## When to cut a release
+
+`[Unreleased]` is a staging area, not a terminal state — a changelog whose entire history sits
+there stops answering "what's new". Cut a version the **first** time any of these happens:
+
+1. **An artifact leaves the repo** — deployed, published, installed on a second machine, or
+   handed to anyone else.
+2. **A version number is stamped into any output** (a manifest, a UI footer, a generated file).
+3. **A tag pipeline exists and has never fired** — release machinery you built but never
+   triggered is the strongest signal you're overdue.
+
+The pre-PR checklist carries the tripwire: if `[Unreleased]` describes more than one shippable
+unit, cut before it grows further.
+
+**Declared variant — never-versioned repos** (internal ops repos with nothing to version): use
+**dated entries** instead of versions — `## 2026-07-19` sections in Keep-a-Changelog style —
+and declare the variant in the START-HERE map so it reads as a choice, not neglect.
+
+Optional CI nudge (warn, not fail — copy into any workflow):
+
+```yaml
+- name: Warn when [Unreleased] gets fat
+  shell: bash
+  run: |
+    n=$(awk '/^## \[Unreleased\]/{f=1;next} /^## /{f=0} f&&/^- /{c++} END{print c+0}' CHANGELOG.md)
+    if [ "$n" -gt 10 ]; then
+      echo "::warning::CHANGELOG.md [Unreleased] holds $n entries - time to cut a release?"
+    fi
+```
 
 ## Releasing
 

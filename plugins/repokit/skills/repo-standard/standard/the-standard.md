@@ -29,6 +29,9 @@ flowchart TD
 - A **START-HERE map** in `AGENTS.md` — where rules, decisions, checklists, CI, and tests live.
 - `docs/` — all documentation, including `docs/adr/` (the ADR learnings log; `0000-template.md`
   is the template).
+- A **resume-state artifact** — `docs/CHECKPOINT.md` by default, or a declared substitute (a
+  living-docs `docs/STATE.json`, a README-status contract) — with a row in the START-HERE map.
+  See *Resume state* below.
 - `README.md`, `CONTRIBUTING.md` (internal "where things live"), `CHANGELOG.md`.
 - `.gitignore`, `.editorconfig`, `.gitattributes`.
 - Conventional Commits; the `repo-standard` skill applies the conventions and checklists.
@@ -57,7 +60,7 @@ No governance overhead. A forever-private repo stays here and stays effortless.
 | `docker-compose` | `compose.yaml` (no `version:`; named volumes for data, commented config/build patterns), `.env.example`, `.dockerignore`; `docker compose config -q` validation CI (Public). Config committed, data in named volumes, secrets in `.env` |
 | `power-platform-connectors` | a committed Postman collection → **OpenAPI 2.0** custom-connector definitions for Microsoft Power Platform. A pinned-Docker generator (`postman-to-openapi` + `api-spec-converter`) converts + normalises to valid Swagger 2.0, splitting per top-level folder **only when a single def would hit the 1 MB limit**; self-validates; a scheduled sync workflow PRs upstream changes. Builds with just Docker — no Postman account (Public) |
 | `skill-plugin` | a Claude Code plugin: `.claude-plugin/`, `skills/<skill>/SKILL.md`, validation *(stub — fill when first needed)* |
-| `collection` | a multi-component repo with a top-level map + per-component subdirs *(stub)* |
+| `collection` | a multi-component repo with a top-level map + per-component subdirs *(stub)*. Its **fleet-hub profile** — a docs-only collection acting as a multi-repo router — is defined in [`fleet.md`](fleet.md) |
 | `mcp-server` | an MCP server *(stub)* |
 | `app-ts` / `app-python` | an application *(stub)* |
 | `script-collection` | a loose collection of scripts *(stub)* |
@@ -90,6 +93,32 @@ workflow) enforces consistency deterministically. `/new-repo` offers it at scaff
 [`living-docs.md`](living-docs.md) for the pattern and the adopt-in-an-existing-repo recipe, and
 [`doc-style.md`](doc-style.md) for the formatting rules every repo's docs should follow.
 
+## Resume state (required at Core)
+
+The doc that decays first is the one a fresh session needs first: "where was this repo left, and
+what's the exact next step?" So Core **requires** a resume-state artifact, and the START-HERE map
+**must** have a row pointing at it. The default is `docs/CHECKPOINT.md` (scaffolded by
+`/new-repo`); a living-docs `docs/STATE.json` or a README-status contract are fine substitutes
+**when declared** in the map (see *Variance declarations*).
+
+The artifact's contract, whatever its form:
+
+- a **last-updated** date (`YYYY-MM-DD`), and
+- an **explicit next step** — the exact next command or task, or `paused — nothing pending`.
+
+The pre-commit checklist carries the tripwire ("resume-state updated, or this commit doesn't
+change state — say which"). Optional CI nudge (warn, not fail — copy into any workflow):
+
+```yaml
+- name: Warn when the checkpoint goes stale
+  shell: bash
+  run: |
+    n=$(git rev-list --count "$(git log -1 --format=%H -- docs/CHECKPOINT.md)..HEAD" 2>/dev/null || echo 0)
+    if [ "$n" -gt 15 ]; then
+      echo "::warning::docs/CHECKPOINT.md untouched for $n commits — is the resume state still true?"
+    fi
+```
+
 ## Naming conventions
 
 RepoKit does **not** impose a single uniform casing. Each name follows the convention of the
@@ -115,6 +144,37 @@ look uniform.
 
 Private → public → published just **switches on the next layer** over the *same* structure. Moving
 a script from a private collection into a public collection repo is a **copy, not a rewrite**.
+
+## Variance declarations
+
+The standard tolerates variants by design — ceremony scales by tier, and a README-status
+contract can genuinely beat a checkpoint file. What it does not tolerate is *silent* variance:
+
+- **Any deviation from the tier's file set** — a substitute file, a relocated file, an omitted
+  component — **must have a row in the START-HERE map** saying what replaces what (e.g.
+  "Changelog → `docs/history/CHANGELOG.md`", "Resume state → README `## Status` contract").
+- **Undeclared deviation is non-compliance. Declared deviation is a variant.** Every deviation
+  in a compliant repo is visible from the START-HERE map alone — no archaeology.
+
+**The self-check.** `scripts/repokit-check.ps1` (stamped by `/new-repo` at Core; retrofittable
+by copying the file) verifies the declared structure actually exists, in seconds: canonical
+agent file + thin shim present and the shim imports it, every START-HERE path resolves, and the
+changelog / ADR dir / resume-state artifact exist at their declared (or default) locations. Run
+it locally before a release, or add one CI line:
+
+```yaml
+- name: RepoKit self-check
+  shell: pwsh
+  run: ./scripts/repokit-check.ps1
+```
+
+**Adoption marker — retro-adopted repos.** A repo that adopts the standard mid-life snaps to the
+conventions at the adoption commit; nothing before it should ever be re-flagged by an audit.
+Declare the compliance horizon with one line in `AGENTS.md`, right under the START-HERE map:
+
+```text
+RepoKit adopted: 2026-07-19 (`<short-sha>`) — history before this commit predates the standard.
+```
 
 ## Publish profiles
 

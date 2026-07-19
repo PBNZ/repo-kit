@@ -19,11 +19,22 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
   release-please fits in at the Published tier.
 - `standard/pre-commit-checklist.md` — run through this before every commit.
 - `standard/pre-pr-checklist.md` — run through this before opening a PR.
+- `standard/session-end-checklist.md` — run through this before ending a working session:
+  unmerged-branch decisions, one-concern commits, resume-state currency.
 - `standard/testing-matrix.md` — what to test, per repo type.
 - `standard/doc-style.md` — deterministic formatting rules for docs (one table style, ISO dates,
   fixed status words) so many sessions/models write like one author.
 - `standard/living-docs.md` — the living-docs add-on: `docs/STATE.json` as the single source for
   volatile facts, state blocks, `scripts/check-docs.ps1`, and the current-state-only runbook rules.
+- `standard/labels.md` — the layered issue/PR label scheme: GitHub defaults as the base, opt-in
+  namespaces (`area:`, `agent:`, `campaign:`), workflow-verdict labels, and the bootstrap commands.
+- `standard/agent-collaboration.md` — humans + agents on a shared board: the real-time board
+  rule, the pickup/handoff loop, closing-force gestures, agent-output signatures, and the
+  session preflight.
+- `standard/fleet.md` — multi-repo projects (hub-and-spoke): the hub as router, the scope test,
+  sibling clones, three-line spoke inheritance, and docs-move-with-stub.
+- `standard/org-migration-checklist.md` — moving repos into an org / rebuilding a project
+  board: the six platform landmines as symptom → cause → fix, with doc citations.
 
 ## The core, inline
 
@@ -42,5 +53,6 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
   there — docs move together in the same commit, and `pwsh scripts/check-docs.ps1` must pass.
 - **Ceremony scales by visibility** (Core → +Public → +Published). Don't add public/published
   governance to a private repo.
-- Before committing or opening a PR, run the relevant checklist above.
+- Before committing or opening a PR, run the relevant checklist above. Before ending a working
+  session, run `standard/session-end-checklist.md`.
 - **After a push or PR, check the remote** — confirm CI/Actions are green and address any GitHub Copilot / reviewer feedback before calling the work done (see `pre-pr-checklist.md`).

@@ -6,8 +6,12 @@ Run through this before opening a pull request.
 - [ ] **CI would pass locally** — run the repo's checks / tests (see `testing-matrix.md`).
 - [ ] **An ADR added or updated** in `docs/adr/` for any notable decision.
 - [ ] **The PR template is filled in** (what & why + the checklist).
+- [ ] **Driving issue referenced** as `Refs #NN` — no closing keywords where a human verifies
+  after merge (see `commit-conventions.md`, *Issue traceability*).
 - [ ] **One concern per PR** — split unrelated changes.
 - [ ] **`CHANGELOG.md`** has the user-visible changes under `## [Unreleased]`.
+- [ ] **Release due?** — if `[Unreleased]` describes more than one shippable unit, cut a version
+  (see `commit-conventions.md`, *When to cut a release*).
 - [ ] **Doc consistency** *(living-docs repos)* — `pwsh scripts/check-docs.ps1` passes, and the
   runbook is current-state-only: no superseded sections, no dated journal prose (see
   `living-docs.md`).

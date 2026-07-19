@@ -11,15 +11,17 @@ This repo **dogfoods its own standard** (Core + Public tier).
 | You want… | Look in |
 |-----------|---------|
 | What RepoKit is / how to install | `README.md` |
+| Where work was left (resume state / checkpoint) | `docs/CHECKPOINT.md` |
 | The standard itself (tiers, where-things-live, do/don't) | `plugins/repokit/skills/repo-standard/standard/the-standard.md` |
 | Commit / changelog / version conventions | `plugins/repokit/skills/repo-standard/standard/commit-conventions.md` |
-| Pre-commit / pre-PR checklists | `plugins/repokit/skills/repo-standard/standard/pre-commit-checklist.md`, `pre-pr-checklist.md` |
+| Pre-commit / pre-PR / session-end checklists | `plugins/repokit/skills/repo-standard/standard/pre-commit-checklist.md`, `pre-pr-checklist.md`, `session-end-checklist.md` |
 | Doc formatting & the living-docs pattern | `plugins/repokit/skills/repo-standard/standard/doc-style.md`, `living-docs.md` |
 | What to test per repo type | `plugins/repokit/skills/repo-standard/standard/testing-matrix.md` |
 | The scaffolding methodology (`/new-repo`) | `plugins/repokit/skills/new-repo/SKILL.md` |
 | Templates stamped into new repos | `plugins/repokit/skills/new-repo/templates/` |
 | Decisions & rationale (learnings log) | `docs/adr/` |
 | Validation scripts (run before committing) | `scripts/` + `.github/workflows/validate.yml` |
+| Standard-compliance self-check (CI dogfoods it here) | `plugins/repokit/skills/new-repo/templates/core/scripts/repokit-check.ps1` |
 
 ## Ground rules
 
