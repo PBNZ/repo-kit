@@ -26,6 +26,8 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
   volatile facts, state blocks, `scripts/check-docs.ps1`, and the current-state-only runbook rules.
 - `standard/labels.md` — the layered issue/PR label scheme: GitHub defaults as the base, opt-in
   namespaces (`area:`, `agent:`, `campaign:`), workflow-verdict labels, and the bootstrap commands.
+- `standard/agent-collaboration.md` — humans + agents on a shared board: the real-time board
+  rule, the pickup/handoff loop, agent-output signatures, and the session preflight.
 
 ## The core, inline
 
