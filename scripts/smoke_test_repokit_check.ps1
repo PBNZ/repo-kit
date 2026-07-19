@@ -27,7 +27,7 @@ function New-Fixture {
     $dir = Join-Path ([IO.Path]::GetTempPath()) ("repokit-check-smoke-" + [guid]::NewGuid())
     New-Item -ItemType Directory -Path (Join-Path $dir 'docs/adr'), (Join-Path $dir 'scripts') -Force | Out-Null
     Set-Content -Path (Join-Path $dir 'AGENTS.md') -Value $agentsTemplate
-    Set-Content -Path (Join-Path $dir 'CLAUDE.md') -Value "# CLAUDE.md`n`n@AGENTS.md"
+    Set-Content -Path (Join-Path $dir 'CLAUDE.md') -Value @('# CLAUDE.md', '', '@AGENTS.md')
     Set-Content -Path (Join-Path $dir 'CHANGELOG.md') -Value "# Changelog`n`n## [Unreleased]"
     Set-Content -Path (Join-Path $dir 'docs/CHECKPOINT.md') -Value "# Checkpoint`n`n- Last updated: 2026-07-19`n- Next step: paused - nothing pending"
     Set-Content -Path (Join-Path $dir 'docs/adr/0000-template.md') -Value '# ADR template'
