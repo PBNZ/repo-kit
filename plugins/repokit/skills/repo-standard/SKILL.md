@@ -33,6 +33,8 @@ skill's base directory (you were given `Base directory for this skill: <ABS>` at
   session preflight.
 - `standard/fleet.md` — multi-repo projects (hub-and-spoke): the hub as router, the scope test,
   sibling clones, three-line spoke inheritance, and docs-move-with-stub.
+- `standard/org-migration-checklist.md` — moving repos into an org / rebuilding a project
+  board: the six platform landmines as symptom → cause → fix, with doc citations.
 
 ## The core, inline
 
