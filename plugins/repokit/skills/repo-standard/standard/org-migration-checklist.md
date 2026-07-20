@@ -55,3 +55,8 @@ is a non-event. Format: symptom → cause → fix. Plan-dependent limits carry a
 - [ ] **Re-enable and re-check board automations against the agent rules** — if "status = Done
   auto-closes" is on, the closing-force rules apply (see
   [`agent-collaboration.md`](agent-collaboration.md)).
+- [ ] **Views and auto-add are UI-only residue.** Project views have no create API, and
+  auto-add is plan-capped (above) — an agent-built board still needs human clicks to be usable.
+  That click-through gets written down as a commissioning-handoff issue on the board itself,
+  assigned and checkboxed (see [`agent-collaboration.md`](agent-collaboration.md),
+  *Commissioning handoff*) — never delivered only as chat prose.

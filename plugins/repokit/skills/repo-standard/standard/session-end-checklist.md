@@ -14,3 +14,6 @@ a minute; a session doesn't end "clean" with any box undecided.
 - [ ] **Working tree clean** — `git status --short` shows nothing stranded.
 - [ ] **(Board repos) cards match reality** — positions and assignees reflect actual state (see
   `agent-collaboration.md`).
+- [ ] **No manual residue delivered only in chat** — every step the human still has to perform
+  is owned by an assigned, checkboxed issue (see `agent-collaboration.md`, *Commissioning
+  handoff*).

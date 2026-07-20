@@ -61,6 +61,36 @@ formatting only for genuine paste-material; markdown links for everything naviga
 is that rule applied to a GUI audience — and remember the rule's scope includes the agent's own
 chat output, not just the issue body.
 
+## Commissioning handoff — an issue owns the manual residue
+
+An agent commissioning shared infrastructure (a project board, CI, DNS, an org policy) can
+usually do almost everything through the CLI/API — and almost never everything. What remains is
+the **manual residue**: steps the agent cannot complete with the tools it holds. Chat is a
+delivery mechanism, not a record — residue delivered only as end-of-session prose is
+unsearchable, unassignable, invisible to anyone else working the board, and gone when the
+session closes, while the work stands reported "done".
+
+This is the session-end checklist's branch rule ("merge it, delete it, or open an issue that
+owns it — no silent survivors") applied to infrastructure:
+
+1. **One issue owns the residue** — opened, or kept open, *before* the work is reported done.
+2. **Assigned to the human who owns the resource, sitting in the review/verify column.** The
+   agent does not close it (the closing-force rule above), so an incomplete commissioning is
+   visible on the board rather than asserted complete in a transcript.
+3. **The body uses the three-audience format** (Options A/B/C plus shared Verify), with each
+   residual step as a **checkbox** so partial progress is visible.
+4. **Each step names *why* it is manual** — one of: *no API*, *permission/scope withheld*,
+   *plan-gated*, *interactive auth*, *deliberately human* (irreversible or judgement-bearing).
+   Reasons expire — "no API" becomes a one-line script when the platform ships the endpoint —
+   and a labelled reason can be re-evaluated where a bare "do this in the UI" cannot.
+5. **It links what was commissioned** — the board, pipeline, or environment — and every doc the
+   commissioning changed, per the linking rule in [`doc-style.md`](doc-style.md) (*Links*).
+
+Known project-board residue — generate the handoff issue from this list, don't re-remember it:
+project **views** by layout (no create API; a finished board still shows a default table), the
+**auto-add workflow** and its plan cap, and re-verification of the built-in workflows after any
+status-option edit (see [`org-migration-checklist.md`](org-migration-checklist.md)).
+
 ## Signatures on agent output
 
 Agent-authored issues, comments, and reviews end with a signature so provenance is never
