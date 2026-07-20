@@ -12,6 +12,8 @@ Run through this before opening a pull request.
 - [ ] **`CHANGELOG.md`** has the user-visible changes under `## [Unreleased]`.
 - [ ] **Release due?** — if `[Unreleased]` describes more than one shippable unit, cut a version
   (see `commit-conventions.md`, *When to cut a release*).
+- [ ] **Links resolve** — no `](#` placeholders, no links to deleted branches; references
+  follow the linking rule in `doc-style.md` (*Links*).
 - [ ] **Doc consistency** *(living-docs repos)* — `pwsh scripts/check-docs.ps1` passes, and the
   runbook is current-state-only: no superseded sections, no dated journal prose (see
   `living-docs.md`).

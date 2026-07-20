@@ -56,8 +56,10 @@ parallel options plus one shared verify section:
 - **Option C — CLI fallback:** the exact commands, code-fenced, for whoever prefers them.
 - **Verify (shared):** observable checks that hold regardless of the option taken.
 
-Formatting rule of thumb: code formatting only for genuine paste-material (commands, literal
-values); markdown links for everything navigable.
+Formatting follows the linking rule in [`doc-style.md`](doc-style.md) (*Links*): code
+formatting only for genuine paste-material; markdown links for everything navigable. Option B
+is that rule applied to a GUI audience — and remember the rule's scope includes the agent's own
+chat output, not just the issue body.
 
 ## Signatures on agent output
 
