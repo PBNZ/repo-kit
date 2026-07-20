@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `standard/doc-style.md` gains a **Links** section (#22): code formatting means "paste this",
+  a link means "go here"; the scope explicitly includes the agent's own chat output, with a
+  construction table for the chat and cross-repo cases where `#NN` and relative links silently
+  fail. Referenced from `agent-collaboration.md`, enforced by a new links-resolve pre-PR item,
+  and named in the scaffolded `AGENTS.md`.
+- A **Commissioning handoff** rule in `standard/agent-collaboration.md` (#21): when an agent
+  commissions shared infrastructure, one assigned, checkboxed issue in the review column owns
+  the manual residue — each step naming why it is manual — instead of end-of-session chat
+  prose. The session-end checklist gains the matching tripwire, and the org-migration
+  board-rebuild checklist routes views/auto-add click-through to the handoff issue (ADR-0008).
+
+### Fixed
+
+- `standard/org-migration-checklist.md`: the status-options landmine is corrected (#23) — a
+  Project's status options *can* be edited via API without breaking the built-in workflows by
+  echoing existing option ids (`ProjectV2SingleSelectFieldOptionInput.id`, verified against the
+  live schema); only a full id-less replacement dangles workflows and item values.
+
 ## [0.4.0] - 2026-07-20
 
 ### Added
