@@ -36,10 +36,17 @@ is a non-event. Format: symptom → cause → fix. Plan-dependent limits carry a
 
 ## Board rebuild
 
-- [ ] **Replacing a Project's status options breaks the built-in workflows silently.** A new
-  column set via API leaves every default workflow ("item closed → status X", "auto-close",
-  "PR merged") pointing at deleted option ids — they show a warning icon and dangle until each
-  is re-edited by hand in the UI. Budget the click-through.
+- [ ] **Status options replaced via API, and now the built-in workflows dangle?** → The option
+  list was sent *without* ids, so GitHub minted new option ids and every default workflow
+  ("item closed → status X", "auto-close", "PR merged") — and every item's stored value — still
+  refers to the old, now-deleted options. → `ProjectV2SingleSelectFieldOptionInput` accepts an
+  optional `id`: read the current options first
+  (`field(name: "Status") { ... on ProjectV2SingleSelectField { options { id name } } }`), echo
+  the id back for every option you keep **or rename**, and omit `id` only for genuinely new
+  options. Options render in array order, so mid-list inserts and automation-preserving renames
+  work in one mutation. Then verify — `workflows(first: 20) { nodes { name enabled } }` plus a
+  re-read of item values — before trusting it. Only a full id-less replacement needs the manual
+  UI click-through.
 - [ ] **Auto-add is per-repo and plan-capped:** each auto-add workflow targets a single
   repository, with a maximum of **1 workflow on Free, 5 on Pro/Team, 20 on Enterprise** — a
   multi-repo board on Free gets exactly one auto-added repo; the rest is manual/agent adds or
