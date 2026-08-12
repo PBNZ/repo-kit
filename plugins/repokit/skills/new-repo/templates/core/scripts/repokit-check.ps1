@@ -10,6 +10,9 @@
 #   4. An ADR directory (or declared substitute) exists.
 #   5. A resume-state row exists in the START-HERE map (docs/CHECKPOINT.md or a declared
 #      substitute) — the row is mandatory.
+#   6. The commit identity is the GitHub handle + noreply email (see the standard, "Author
+#      identity") — repo-local config and history since the adoption marker — unless the
+#      START-HERE map declares an author-identity variance.
 #
 # Usage: pwsh scripts/repokit-check.ps1 [-RepoRoot <path>]
 # Exit code: 0 = compliant, 1 = one or more failures.
@@ -116,6 +119,75 @@ if ($resumeRows.Count -gt 0) {
     }
 } else {
     Fail 'No resume-state row in the START-HERE map (docs/CHECKPOINT.md or a declared substitute is required at Core)'
+}
+
+# --- 6. Author identity (privacy default) ---------------------------------------------------
+# The standard ("Author identity"): the author is the GitHub handle + noreply email in both
+# identity fields. A declared variance row switches the check off; the adoption marker bounds
+# the history scan; repos without git (or with no commits yet) skip cleanly.
+function Test-AnonymousIdentity([string]$Name, [string]$Email) {
+    # GitHub's own web-flow identity is exactly "GitHub <noreply@github.com>" — a real name
+    # paired with that email must not slip through.
+    if ($Email -eq 'noreply@github.com') { return ($Name -eq 'GitHub') }
+    if ($Email -match '^(\d+\+)?(?<login>[^@]+)@users\.noreply\.github\.com$') {
+        return ($Name -eq $Matches['login'])                # the handle, nothing else
+    }
+    return $false
+}
+
+if ((Get-MapRows '(?i)author\s+identity').Count -gt 0) {
+    Pass 'Author-identity variance declared in the START-HERE map - identity check skipped'
+} elseif (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    Warn 'git not available - author-identity check skipped'
+} else {
+    git -C $RepoRoot rev-parse --git-dir *> $null
+    if ($LASTEXITCODE -ne 0) {
+        Warn 'Not a git repository - author-identity check skipped'
+    } else {
+        # 6a. The configured repo-local identity — what the *next* commit will use.
+        $cfgName  = git -C $RepoRoot config --local --get user.name
+        $cfgEmail = git -C $RepoRoot config --local --get user.email
+        if ($cfgName -or $cfgEmail) {
+            if (Test-AnonymousIdentity $cfgName $cfgEmail) {
+                Pass "Repo-local git identity is handle + noreply ($cfgName)"
+            } else {
+                Fail "Repo-local git identity is not handle + noreply: $cfgName <$cfgEmail> - fix it, or declare an author-identity variance row"
+            }
+        }
+        # 6b. Identities already in history, bounded by the adoption marker when one exists.
+        $range = 'HEAD'
+        $agentsRaw = ''
+        if (Test-Path -LiteralPath $agentsPath -PathType Leaf) {
+            $agentsRaw = Get-Content -LiteralPath $agentsPath -Raw
+        }
+        if ($agentsRaw -match 'RepoKit adopted:[^\r\n]*?`([0-9a-fA-F]{7,40})`') {
+            $adoptSha = $Matches[1]
+            git -C $RepoRoot rev-parse --verify --quiet "$adoptSha^{commit}" *> $null
+            if ($LASTEXITCODE -eq 0) {
+                $range = "$adoptSha..HEAD"
+            } else {
+                Warn "Adoption marker commit $adoptSha not in this clone (shallow?) - scanning the history that is available"
+            }
+        }
+        $idLines = @(git -C $RepoRoot log $range --format='%an%x09%ae%x09%cn%x09%ce' 2>$null)
+        if ($LASTEXITCODE -ne 0) {
+            Warn 'No commits yet - history identity check skipped'
+        } else {
+            $bad = [System.Collections.Generic.HashSet[string]]::new()
+            foreach ($line in $idLines) {
+                $an, $ae, $cn, $ce = $line -split "`t"
+                if (-not (Test-AnonymousIdentity $an $ae)) { [void]$bad.Add("$an <$ae>") }
+                if (-not (Test-AnonymousIdentity $cn $ce)) { [void]$bad.Add("$cn <$ce>") }
+            }
+            if ($bad.Count -eq 0) {
+                Pass "Commit identities are handle + noreply ($($idLines.Count) commit(s) scanned)"
+            } else {
+                foreach ($id in $bad) {
+                    Fail "Commit identity is not handle + noreply: $id - see the standard, 'Author identity' (a real identity needs a declared variance row)"
+                }
+            }
+        }
+    }
 }
 
 # --- Summary -------------------------------------------------------------------------------

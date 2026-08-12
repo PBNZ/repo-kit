@@ -23,11 +23,13 @@ SKIP_FILES = {
     "LICENSE",
 }
 
-# Literal strings that are allowed (structured URLs, not personal contacts).
+# Literal strings that are allowed (structured URLs and GitHub service
+# addresses, not personal contacts).
 ALLOWED_SUBSTRINGS = (
     "apache.org",
     "noreply.github.com",
     "users.noreply.github.com",
+    "noreply@github.com",  # GitHub's own web-flow committer identity
 )
 
 

@@ -4,7 +4,9 @@
 #
 # Builds a minimal compliant fixture repo and asserts the check passes, then proves the check
 # FAILS on each drift case from the retrospective (refs #16): missing shim, non-importing shim,
-# broken START-HERE path, missing changelog, missing ADR dir, missing resume-state row.
+# broken START-HERE path, missing changelog, missing ADR dir, missing resume-state row — plus
+# the author-identity cases (refs #25/#26): handle + noreply passes, a real name or personal
+# email fails, and a declared variance row switches the check off.
 
 $ErrorActionPreference = 'Stop'
 
@@ -76,6 +78,40 @@ Assert-Check 'missing ADR dir fails' $d 1
 $d = New-Fixture
 Set-Content (Join-Path $d 'AGENTS.md') (($agentsTemplate -split "`n") -notmatch 'resume state' -join "`n")
 Assert-Check 'missing resume-state row fails' $d 1
+
+# --- Author-identity cases (refs #25/#26) — these fixtures are real git repos. ---------------
+function New-GitFixture([string]$UserName, [string]$UserEmail) {
+    $d = New-Fixture
+    git -C $d init -q -b main 2>$null
+    if ($LASTEXITCODE -ne 0) { git -C $d init -q; git -C $d branch -m main }   # git < 2.28
+    git -C $d config core.autocrlf false   # throwaway fixture — silence Windows CRLF warnings
+    git -C $d config user.name  $UserName
+    git -C $d config user.email $UserEmail
+    git -C $d config commit.gpgsign false
+    git -C $d add -A
+    git -C $d commit -q -m 'chore: fixture' | Out-Null
+    return $d
+}
+
+# 8. The privacy default passes: handle as the name, noreply as the email.
+Assert-Check 'handle + noreply identity passes' (New-GitFixture 'octocat' 'octocat@users.noreply.github.com') 0
+
+# 9. A real name with the anonymous email fails — the exact #26 signature (the email hides,
+#    the name leaks).
+Assert-Check 'real-name author fails' (New-GitFixture 'Octo Cat' '583231+octocat@users.noreply.github.com') 1
+
+# 10. A personal email fails. (Concatenated so the private-contact scan never matches this file.)
+Assert-Check 'personal email fails' (New-GitFixture 'octocat' ('octocat@' + 'example.com')) 1
+
+# 11. The same real identity with a declared variance row passes — a decision, not a leak.
+$d = New-GitFixture 'Octo Cat' ('octocat@' + 'example.com')
+Add-Content (Join-Path $d 'AGENTS.md') '| Author identity | real name by choice (ADR-0001) |'
+Assert-Check 'declared author-identity variance passes' $d 0
+
+# 12. GitHub's own web-flow identity passes — but only with GitHub's own name (13): a real
+#     name paired with the web-flow email must not slip through.
+Assert-Check 'web-flow identity passes' (New-GitFixture 'GitHub' 'noreply@github.com') 0
+Assert-Check 'real name on the web-flow email fails' (New-GitFixture 'Octo Cat' 'noreply@github.com') 1
 
 if ($script:failed -gt 0) { Write-Host "smoke_test_repokit_check: $script:failed failure(s)"; exit 1 }
 Write-Host 'smoke_test_repokit_check: all cases passed'

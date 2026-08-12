@@ -127,7 +127,11 @@ Optional CI nudge (warn, not fail — copy into any workflow):
 
 ## Commit identity
 
-Commits use the GitHub **noreply** email (`<id>+<login>@users.noreply.github.com`), set
-**repo-locally**, so a repo that goes public never exposes a personal address. Use a real
-name/email only when the user explicitly wants it. `/new-repo` sets this on the scaffold commit; keep
-it for later commits too.
+Commits are authored as the GitHub **handle** with the GitHub **noreply** email
+(`login <id+login@users.noreply.github.com>`), set **repo-locally**, so a repo that goes public
+never exposes a real name or a personal address. The name is the half that gets missed: an email
+reads as obviously an address, but `user.name` set to a real name leaks just as permanently —
+a commit identity leaves history only via a rewrite. Use a real name/email only when the user
+explicitly wants it — a declared variance (see [`the-standard.md`](the-standard.md), *Author
+identity*). `/new-repo` sets this on the scaffold commit; keep it for later commits too —
+`scripts/repokit-check.ps1` verifies both fields.

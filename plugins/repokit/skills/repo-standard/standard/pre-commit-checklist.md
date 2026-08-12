@@ -5,7 +5,9 @@ Run through this before every commit.
 - [ ] **Builds / lints clean** for this repo type (see `testing-matrix.md`).
 - [ ] **Tests pass** for the code you touched.
 - [ ] **Every changed line traces to the task.** No drive-by edits; surgical changes only.
-- [ ] **No secrets, tokens, or private contact info** (no email addresses) in the diff.
+- [ ] **No secrets, tokens, or private identity** in the diff — no email addresses, no real
+  personal names: the author is the GitHub handle unless this repo declares otherwise (see
+  `the-standard.md`, *Author identity*).
 - [ ] **`CHANGELOG.md` updated** under `## [Unreleased]` if the change is user-visible.
 - [ ] **Docs move together** *(living-docs repos)* — if the change alters anything a doc states
   (status, resources, counts, dates), update `docs/STATE.json` in the same commit, run

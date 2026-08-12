@@ -140,6 +140,47 @@ many of these names are read by tools that require an exact case.
 follow the language/ecosystem idiom; never rename a convention-bearing file just to make the tree
 look uniform.
 
+## Author identity
+
+The **GitHub handle** (account or org login) identifies the author everywhere an
+author/owner/copyright value is written: the git commit identity, module/package metadata (a
+`.psd1` `Author` field, an npm `author`), the licence copyright line, ADRs, docs. Commits pair
+the handle with the GitHub **noreply** email, set repo-locally — see
+[`commit-conventions.md`](commit-conventions.md) (*Commit identity*).
+
+Why: the promotion path is private-now/public-later, so by the time visibility flips there must
+be nothing personal left to scrub. File contents can be edited out; a real name in commit
+history is permanent short of a rewrite and force-push. The cheap moment to get this right is
+commit #1 — which is why `/new-repo` defaults every identity value to the handle.
+
+A real personal name is **opt-in, per repo** — the user's explicit choice (say, legal
+attribution on a published package), never a default. That choice is a *declared variance*:
+record it in an ADR and add a START-HERE row (e.g. "Author identity → real name by choice,
+ADR-NNNN") so an audit reads it as a decision, not a leak.
+
+**What catches reintroduction.** `scripts/repokit-check.ps1` fails when the repo-local git
+identity, or any commit since the adoption marker, uses a non-noreply email or an author name
+that isn't the handle — unless the variance row above is declared. The self-check cannot know
+your name, so it cannot catch it in *file contents*; a repo that wants a tree guard adds a CI
+grep for the specific name, bracketed so the step never matches its own source, and matching
+the first name alone as well as the pair (the case a "First Last" grep misses is
+`/home/<firstname>/...` in a runbook):
+
+```yaml
+- name: No real personal name in the tree
+  run: |
+    if git grep -Iin -e '[J]ane' -e '[D]oe' -- . ; then
+      echo "::error::A real personal name appears above. Identify the author by handle."
+      exit 1
+    fi
+```
+
+State the trade-off when offering this guard: the bracket defeats the grep, not a reader — the
+pattern still spells the name. It fits a repo that stays private, or a public one where the
+name-to-handle association is already public and the goal is *no new occurrences*. Where the
+association itself is the secret, keep the pattern out of the tree (a repository secret works)
+and rely on the identity check plus review.
+
 ## Promotion path
 
 Private → public → published just **switches on the next layer** over the *same* structure. Moving
@@ -193,5 +234,7 @@ RepoKit adopted: 2026-07-19 (`<short-sha>`) — history before this commit preda
 - **Do** keep private repos at Core. **Don't** force public/published governance onto them.
 - **Do** record notable decisions as ADRs. **Don't** rely on commit messages alone for rationale.
 - **Do** keep `SKILL.md` files and templates as plain prose — no secrets, no email addresses.
+- **Do** identify the author by the GitHub handle — commits, metadata, copyright lines. A real
+  name is a per-repo opt-in, declared in the START-HERE map (see *Author identity*).
 - **Do** delete superseded doc content — git keeps the history. **Don't** keep "superseded by v2"
   annotations or before/after duplicates in living docs (see `living-docs.md`).
