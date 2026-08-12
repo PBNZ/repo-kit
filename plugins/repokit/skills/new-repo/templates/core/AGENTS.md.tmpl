@@ -17,6 +17,9 @@ checklists, use the `repo-standard` skill (RepoKit: `/plugin marketplace add PBN
   reads `CLAUDE.md`, not `AGENTS.md`).
 - Conventional Commits; one concern per PR. Record notable decisions as ADRs in `docs/adr/`.
 - Ceremony scales by visibility — this repo is at the **{{tier}}** tier.
+- The author is the **GitHub handle** everywhere, including the repo-local commit identity
+  `/new-repo` configured — don't override it with a real name/email unless this repo declares
+  that variance (the `repo-standard` skill's `standard/the-standard.md`, *Author identity*).
 - Humans + agents sharing an issue board: follow the `repo-standard` skill's
   `standard/agent-collaboration.md` — cards move when state changes, run the session preflight
   before board work, sign agent-authored output.
