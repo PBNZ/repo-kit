@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The session-end checklist's branch item no longer strands rebase/squash-merged branches
+  (#28): `git branch -a --no-merged` is named as an ancestry test that over-reports on those
+  merge methods, the item prescribes content-based confirmation before force-deleting
+  (`gh pr list --state merged --head`, or `git log --cherry` for no-PR rebases) with an
+  explicit "never `-D` a branch that fails both checks", and the remote half is closed by the
+  `gh repo edit --delete-branch-on-merge` + `git fetch --prune` recipe.
+
 ## [0.5.0] - 2026-07-20
 
 ### Added
