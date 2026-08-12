@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The standard states the **author-identity convention** (#25, ADR-0009): the GitHub handle
+  identifies the author everywhere an author/owner/copyright value is written; a real personal
+  name is a per-repo opt-in recorded as an ADR plus a START-HERE variance row.
+  `repokit-check.ps1` now fails on a non-anonymous repo-local git identity or commit history
+  (bounded by the adoption marker, switched off by the variance row), and the standard
+  documents an optional bracketed-grep CI tree guard with its trade-off stated.
+
+### Fixed
+
+- `/new-repo` no longer configures the commit identity from the GitHub profile's real name
+  (#26): the recipe prefers the **handle** (`.login`) for `user.name`, the `{{author}}`
+  interview default is the handle instead of a personal name, and the licence template's
+  copyright line is stamped from `{{year}}`/`{{author}}` rather than hardcoded.
+
 ## [0.5.0] - 2026-07-20
 
 ### Added
