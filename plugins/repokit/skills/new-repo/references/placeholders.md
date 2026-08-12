@@ -8,7 +8,7 @@
 |-------|---------|
 | `{{name}}` | repo / directory name (kebab-case) |
 | `{{description}}` | one-line description |
-| `{{author}}` | author name (default `Peter Braun`) |
+| `{{author}}` | author identity (default: the GitHub **handle**, `gh api user --jq .login`; a real personal name only on the user's explicit request — see the standard's *Author identity*) |
 | `{{license}}` | SPDX licence id (default `Apache-2.0`) |
 | `{{type}}` | the chosen repo type |
 | `{{tier}}` | resolved tier label (`Core`, `Core + Public`, or `Core + Public + Published`) |
