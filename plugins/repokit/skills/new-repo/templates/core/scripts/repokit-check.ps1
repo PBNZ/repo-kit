@@ -126,7 +126,9 @@ if ($resumeRows.Count -gt 0) {
 # identity fields. A declared variance row switches the check off; the adoption marker bounds
 # the history scan; repos without git (or with no commits yet) skip cleanly.
 function Test-AnonymousIdentity([string]$Name, [string]$Email) {
-    if ($Email -eq 'noreply@github.com') { return $true }   # GitHub's own web-flow identity
+    # GitHub's own web-flow identity is exactly "GitHub <noreply@github.com>" — a real name
+    # paired with that email must not slip through.
+    if ($Email -eq 'noreply@github.com') { return ($Name -eq 'GitHub') }
     if ($Email -match '^(\d+\+)?(?<login>[^@]+)@users\.noreply\.github\.com$') {
         return ($Name -eq $Matches['login'])                # the handle, nothing else
     }

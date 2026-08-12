@@ -82,7 +82,8 @@ Assert-Check 'missing resume-state row fails' $d 1
 # --- Author-identity cases (refs #25/#26) — these fixtures are real git repos. ---------------
 function New-GitFixture([string]$UserName, [string]$UserEmail) {
     $d = New-Fixture
-    git -C $d init -q -b main
+    git -C $d init -q -b main 2>$null
+    if ($LASTEXITCODE -ne 0) { git -C $d init -q; git -C $d branch -m main }   # git < 2.28
     git -C $d config core.autocrlf false   # throwaway fixture — silence Windows CRLF warnings
     git -C $d config user.name  $UserName
     git -C $d config user.email $UserEmail
@@ -106,6 +107,11 @@ Assert-Check 'personal email fails' (New-GitFixture 'octocat' ('octocat@' + 'exa
 $d = New-GitFixture 'Octo Cat' ('octocat@' + 'example.com')
 Add-Content (Join-Path $d 'AGENTS.md') '| Author identity | real name by choice (ADR-0001) |'
 Assert-Check 'declared author-identity variance passes' $d 0
+
+# 12. GitHub's own web-flow identity passes — but only with GitHub's own name (13): a real
+#     name paired with the web-flow email must not slip through.
+Assert-Check 'web-flow identity passes' (New-GitFixture 'GitHub' 'noreply@github.com') 0
+Assert-Check 'real name on the web-flow email fails' (New-GitFixture 'Octo Cat' 'noreply@github.com') 1
 
 if ($script:failed -gt 0) { Write-Host "smoke_test_repokit_check: $script:failed failure(s)"; exit 1 }
 Write-Host 'smoke_test_repokit_check: all cases passed'
