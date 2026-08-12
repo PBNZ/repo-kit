@@ -29,7 +29,11 @@ Gather these from the user's arguments / message, else ask — keep it to load-b
 - **type** — one of: `powershell-module`, `docker-compose`, `power-platform-connectors`,
   `skill-plugin`, `collection`, `mcp-server`, `app-ts`, `app-python`, `script-collection`.
 - **visibility** — `private` (= Core tier), `public` (= +Public), or `published` (= +Published).
-- **author** — default `Peter Braun` (`PBNZ`).
+- **author** — the identity stamped wherever an author/owner/copyright value is written. Default:
+  the **GitHub handle** of the gh-authenticated user (`gh api user --jq .login`; no `gh` → ask).
+  A real personal name only when the user explicitly chooses one for this repo — that choice is a
+  declared variance: record it in ADR-0001 and give it a START-HERE row (see the standard's
+  *Author identity*).
 - **license** — default `Apache-2.0`.
 - **living-docs add-on** — yes/no, default **no**. Ask: *"Will this repo's docs track live
   operational state (deployed resources, scheduled jobs, long-running migrations)?"* If yes, the
@@ -88,16 +92,20 @@ want to continue.
 5. **Initialise git** in the new repo directory:
    - **Default branch `main`, never `master`:** `git init -b main` (`-b` needs git >= 2.28; if it
      errors, run `git init` then `git branch -m main`).
-   - **Commit identity -- anonymous by default.** So a repo that later goes public never leaks a
-     personal email, set a **repo-local** (not `--global`) identity using the GitHub *noreply*
-     address. Resolve it for the gh-authenticated user and apply it locally:
+   - **Commit identity -- the handle + noreply, anonymous by default.** So a repo that later goes
+     public never leaks a real name *or* a personal email, set a **repo-local** (not `--global`)
+     identity from the GitHub **handle** and the GitHub *noreply* address -- both fields, not just
+     the email (a leaked file can be edited; a leaked commit identity survives until a history
+     rewrite). Resolve them for the gh-authenticated user and apply locally:
      ```
-     gh api user --jq '"\(.name // .login)\t\(.id)+\(.login)@users.noreply.github.com"'
-     git config user.name  "<name-or-login>"
+     gh api user --jq '"\(.login)\t\(.id)+\(.login)@users.noreply.github.com"'
+     git config user.name  "<login>"
      git config user.email "<id>+<login>@users.noreply.github.com"
      ```
-     Use a **real** name/email only if the user explicitly asked (you may ask, but the default is the
-     noreply address). No `gh` available? Fall back to `<login>@users.noreply.github.com`, or ask.
+     Use a **real** name/email only if the user explicitly asked -- you may ask, but the default
+     for both fields is the handle + noreply, and an explicit real identity is recorded in
+     ADR-0001 (see the standard's *Author identity*). No `gh` available? Ask for the handle and
+     fall back to `<login>@users.noreply.github.com`.
    - **Stage + commit:** `git add -A -f` -- the `-f` force-adds the stamped files past any global
      gitignore (e.g. a `*private*` rule that would silently drop a `Private/` dir; safe here, the tree
      holds only what you stamped, and the repo's own `.gitignore` governs later additions) -- then one
