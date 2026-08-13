@@ -5,7 +5,9 @@
 # Verifies the repo's *declared* structure actually exists (see the RepoKit standard,
 # "Variance declarations"):
 #   1. AGENTS.md (canonical agent file) exists; CLAUDE.md (loader shim) exists and imports it.
-#   2. Every path named in the START-HERE map resolves to an existing file or directory.
+#   2. Every path named in the START-HERE map resolves to an existing file or directory. A
+#      token suffixed "(planned)" declares a path the repo has not grown into yet and is
+#      skipped — the standard says not to pre-create empty directories.
 #   3. A changelog exists at the default location or a declared one.
 #   4. An ADR directory (or declared substitute) exists.
 #   5. A resume-state row exists in the START-HERE map (docs/CHECKPOINT.md or a declared
@@ -71,14 +73,19 @@ if ($dataRows.Count -eq 0) {
 } else {
     Pass "START-HERE map found ($($dataRows.Count) rows)"
     foreach ($row in $dataRows) {
-        $tokens = [regex]::Matches($row, '`([^`]+)`') | ForEach-Object { $_.Groups[1].Value }
-        foreach ($tok in $tokens) {
-            if ($tok.Contains('/') -and $tok -match '^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*/?$') {
-                if (Test-Path -LiteralPath (Join-Path $RepoRoot $tok.TrimEnd('/'))) {
-                    Pass "START-HERE path resolves: $tok"
-                } else {
-                    Fail "START-HERE path does not resolve: $tok"
-                }
+        foreach ($m in [regex]::Matches($row, '`([^`]+)`')) {
+            $tok = $m.Groups[1].Value
+            if (-not ($tok.Contains('/') -and $tok -match '^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*/?$')) { continue }
+            # "(planned)" right after the closing backtick marks a declared-but-not-yet-created
+            # path; it covers only the token it follows.
+            if ($row.Substring($m.Index + $m.Length) -match '^\s*\(planned\)') {
+                Pass "START-HERE path declared planned - not required to exist yet: $tok"
+                continue
+            }
+            if (Test-Path -LiteralPath (Join-Path $RepoRoot $tok.TrimEnd('/'))) {
+                Pass "START-HERE path resolves: $tok"
+            } else {
+                Fail "START-HERE path does not resolve: $tok"
             }
         }
     }

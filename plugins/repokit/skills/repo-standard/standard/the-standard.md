@@ -140,6 +140,11 @@ many of these names are read by tools that require an exact case.
 follow the language/ecosystem idiom; never rename a convention-bearing file just to make the tree
 look uniform.
 
+**Repo names:** `/new-repo` defaults to kebab-case, but a deliberate **branding name** (a
+camelCase product name, say) is an allowed exception — the user's choice of their own product
+name is not a style violation to argue with. Record the choice in ADR-0001 so an audit reads it
+as a decision.
+
 ## Author identity
 
 The **GitHub handle** (account or org login) identifies the author everywhere an
@@ -215,6 +220,12 @@ it locally before a release, or add one CI line:
   shell: pwsh
   run: ./scripts/repokit-check.ps1
 ```
+
+**Planned paths.** A map row may name layout the repo has not grown into yet (say, a monorepo's
+`firmware/` and `app/` components) — declaring intent is useful, and the standard says *not* to
+pre-create empty directories. Suffix the backticked token with `(planned)` —
+`` `firmware/` (planned) `` — and the self-check skips that token's existence assertion. The
+marker covers only the token it follows; remove it when the path becomes real.
 
 **Adoption marker — retro-adopted repos.** A repo that adopts the standard mid-life snaps to the
 conventions at the adoption commit; nothing before it should ever be re-flagged by an audit.
