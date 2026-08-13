@@ -214,6 +214,12 @@ it locally before a release, or add one CI line:
   run: ./scripts/repokit-check.ps1
 ```
 
+**Planned paths.** A map row may name layout the repo has not grown into yet (say, a monorepo's
+`firmware/` and `app/` components) — declaring intent is useful, and the standard says *not* to
+pre-create empty directories. Suffix the backticked token with `(planned)` —
+`` `firmware/` (planned) `` — and the self-check skips that token's existence assertion. The
+marker covers only the token it follows; remove it when the path becomes real.
+
 **Adoption marker — retro-adopted repos.** A repo that adopts the standard mid-life snaps to the
 conventions at the adoption commit; nothing before it should ever be re-flagged by an audit.
 Declare the compliance horizon with one line in `AGENTS.md`, right under the START-HERE map:
