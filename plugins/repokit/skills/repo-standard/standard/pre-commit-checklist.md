@@ -7,7 +7,9 @@ Run through this before every commit.
 - [ ] **Every changed line traces to the task.** No drive-by edits; surgical changes only.
 - [ ] **No secrets, tokens, or private identity** in the diff — no email addresses, no real
   personal names: the author is the GitHub handle unless this repo declares otherwise (see
-  `the-standard.md`, *Author identity*).
+  `the-standard.md`, *Author identity*). Core ships `scripts/install-privacy-guard.ps1` to
+  enforce this locally with an untracked hook — and a guard that has never failed a negative
+  test is not yet a guard, which is why the installer runs one on every install.
 - [ ] **`CHANGELOG.md` updated** under `## [Unreleased]` if the change is user-visible.
 - [ ] **Docs move together** *(living-docs repos)* — if the change alters anything a doc states
   (status, resources, counts, dates), update `docs/STATE.json` in the same commit, run
@@ -20,4 +22,5 @@ Run through this before every commit.
 
 > Enforcement note: Claude Code hooks only catch commands run *in-session*; a native `git commit`
 > from your terminal bypasses them. For out-of-session safety, lean on git hooks + CI — that's why
-> the Public tier ships a validation workflow.
+> the Public tier ships a validation workflow, and why Core ships the privacy-guard installer
+> (re-run it per clone; `.git/hooks/` does not travel).

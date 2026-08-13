@@ -15,6 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   material is expected while still private. Recorded in ADR-0001, no variance row needed: the
   standard's *Promotion path* now states an early licence is the promotion path, not a
   deviation. Default stays no; forever-private repos keep zero ceremony.
+- Core ships a **tested privacy-guard pre-commit hook** (#34, ADR-0012):
+  `scripts/install-privacy-guard.ps1` writes an untracked `.git/hooks/` guard that blocks
+  staged additions, staged filenames, and non-noreply commit identities matching
+  locally-entered patterns (case-insensitive literals, not regexes — the hand-rolled guard
+  this replaces died on a BRE quoting subtlety), refuses a configured `core.hooksPath`, and
+  finishes every install with an automatic negative test that removes the hook on failure.
+  Documented in the standard's *Author identity* and the pre-commit checklist ("a guard that
+  has never failed a negative test is not yet a guard"); CI smoke-tests the template
+  end-to-end through real `git commit` runs.
 
 ### Fixed
 
