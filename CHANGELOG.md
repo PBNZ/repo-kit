@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Two `/new-repo` documentation gaps observed in a scaffolding session (#33): the skill now
+  documents **adopting a directory that already has content** (inventory first, pre-existing
+  content wins collisions, two commits with the import before the scaffold, recorded in
+  ADR-0001), and the naming conventions state that a deliberate **branding name** is an
+  allowed exception to the kebab-case default — the user's own product name is accepted and
+  recorded in ADR-0001, not argued with.
+
 ## [0.6.0] - 2026-08-13
 
 ### Added
