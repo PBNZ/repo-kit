@@ -6,7 +6,7 @@
 
 | Token | Meaning |
 |-------|---------|
-| `{{name}}` | repo / directory name (kebab-case) |
+| `{{name}}` | repo / directory name (kebab-case by default; a deliberate branding name is an allowed exception, recorded in ADR-0001) |
 | `{{description}}` | one-line description |
 | `{{author}}` | author identity (default: the GitHub **handle**, `gh api user --jq .login`; a real personal name only on the user's explicit request — see the standard's *Author identity*) |
 | `{{license}}` | SPDX licence id (default `Apache-2.0`) |

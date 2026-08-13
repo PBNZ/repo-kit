@@ -140,6 +140,11 @@ many of these names are read by tools that require an exact case.
 follow the language/ecosystem idiom; never rename a convention-bearing file just to make the tree
 look uniform.
 
+**Repo names:** `/new-repo` defaults to kebab-case, but a deliberate **branding name** (a
+camelCase product name, say) is an allowed exception — the user's choice of their own product
+name is not a style violation to argue with. Record the choice in ADR-0001 so an audit reads it
+as a decision.
+
 ## Author identity
 
 The **GitHub handle** (account or org login) identifies the author everywhere an
