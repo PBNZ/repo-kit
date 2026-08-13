@@ -35,6 +35,33 @@ Deliberate exception to "CI ships at the Public tier": the `living-docs` add-on 
 `docs.yml` check workflow at **core**, because deterministic doc-consistency enforcement is the
 add-on's entire point — including, especially, in a private repo (see ADR-0006).
 
+## Early licence — promotion-planned private repos (opt-in)
+
+A `private` repo whose public release is already planned may opt in during the interview
+(ADR-0011):
+
+```
+file_set ∪= templates/public/LICENSE.tmpl    (on "public release already planned?" = yes)
+file_set ∪= NOTICE                           (additionally, when third-party licensed
+                                              material is expected while still private)
+```
+
+This is the one deliberate case where a Public-tier template ships at Core: once the licence
+choice is made, stamping it later adds a promotion step without adding safety, and third-party
+attributions belong in `NOTICE` from the moment the material arrives — not from the go-public
+commit. `NOTICE` has no template file; write it as:
+
+```
+{{name}}
+Copyright {{year}} {{author}}
+
+Third-party attributions are added below as licensed material is incorporated.
+```
+
+Record the opt-in in ADR-0001. No START-HERE variance row is needed: an early licence on a
+promotion-planned repo is the standard's promotion path, not a deviation from the tier's file
+set (see the standard, *Promotion path*).
+
 ## Precedence — higher tier wins, then type overlay wins
 
 If the same target path is produced by more than one template, pick a single winner (you never

@@ -39,6 +39,12 @@ Gather these from the user's arguments / message, else ask — keep it to load-b
   operational state (deployed resources, scheduled jobs, long-running migrations)?"* If yes, the
   add-on stamps `docs/RUNBOOK.md`, `docs/STATE.json`, `scripts/check-docs.ps1`, and a `docs.yml`
   check workflow (see `references/living-docs-rules.md`).
+- **early licence** — *private repos only*, default **no**. Ask: *"Is a public release already
+  planned?"* If yes, stamp `LICENSE` now from the Public-tier template, and ask one follow-up:
+  *"Will third-party licensed material be incorporated while still private?"* — if so, also
+  stamp `NOTICE` (see `references/file-set-resolution.md`, *Early licence*). Record both answers
+  in ADR-0001. No START-HERE variance row — an early licence on a promotion-planned repo follows
+  the standard's *Promotion path*, it doesn't deviate from it.
 - For `powershell-module` only: **ModuleName** (PascalCase, e.g. `MyModule`).
 
 If the chosen type is a **stub** (anything other than `powershell-module`, `docker-compose`, or `power-platform-connectors`), tell the user so: the

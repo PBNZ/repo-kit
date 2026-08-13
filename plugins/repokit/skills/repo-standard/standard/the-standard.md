@@ -186,6 +186,13 @@ and rely on the identity check plus review.
 Private → public → published just **switches on the next layer** over the *same* structure. Moving
 a script from a private collection into a public collection repo is a **copy, not a rewrite**.
 
+**Early licence (opt-in).** When the public release is already planned at scaffold time,
+`/new-repo` offers to stamp `LICENSE` at Core — and `NOTICE` too, when third-party licensed
+material will be incorporated while still private, since its attribution belongs there from the
+moment the material arrives. The choice is recorded in ADR-0001; no START-HERE variance row is
+needed, because a licence stamped early on a promotion-planned repo *is* the promotion path
+("nothing to scrub at flip time"), not a deviation from the Core file set (ADR-0011).
+
 ## Variance declarations
 
 The standard tolerates variants by design — ceremony scales by tier, and a README-status

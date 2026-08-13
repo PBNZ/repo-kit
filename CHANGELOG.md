@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `/new-repo` offers an **early-licence opt-in** to promotion-planned private repos (#32,
+  ADR-0011): answer yes to "is a public release already planned?" and `LICENSE` is stamped at
+  Core from the Public-tier template — plus a minimal `NOTICE` when third-party licensed
+  material is expected while still private. Recorded in ADR-0001, no variance row needed: the
+  standard's *Promotion path* now states an early licence is the promotion path, not a
+  deviation. Default stays no; forever-private repos keep zero ceremony.
+
 ## [0.6.0] - 2026-08-13
 
 ### Added
