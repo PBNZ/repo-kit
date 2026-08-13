@@ -109,6 +109,17 @@ jobs:
         shell: pwsh
         run: ./scripts/smoke_test_repokit_check.ps1
 
+  smoke-privacy-guard:
+    name: Smoke-test privacy-guard installer (pwsh on Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Prove the installer self-tests and the hook blocks each leak class
+        shell: pwsh
+        run: ./scripts/smoke_test_privacy_guard.ps1
+
   smoke-living-docs:
     name: Smoke-test living-docs add-on (pwsh on Linux)
     runs-on: ubuntu-latest

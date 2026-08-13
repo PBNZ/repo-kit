@@ -121,7 +121,9 @@ want to continue.
    run an issue board.
 
 7. **Print the summary:** the resolved tier × type, the file tree, the START-HERE map, and next
-   steps — "review locally; you publish when ready."
+   steps — "review locally; you publish when ready." If the repo may ever go public, include
+   the next step "run `pwsh scripts/install-privacy-guard.ps1` (once per clone — the hook it
+   installs stays in `.git/hooks/` and does not travel)".
 
 ## Boundaries
 

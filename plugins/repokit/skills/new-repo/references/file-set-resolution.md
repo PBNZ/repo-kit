@@ -62,7 +62,7 @@ merge two templates by hand):
 
 - `templates/core/**` → `AGENTS.md`, `CLAUDE.md`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`,
   `.gitignore`, `.editorconfig`, `.gitattributes`, `docs/adr/0000-template.md`,
-  `docs/CHECKPOINT.md`, `scripts/repokit-check.ps1`
+  `docs/CHECKPOINT.md`, `scripts/repokit-check.ps1`, `scripts/install-privacy-guard.ps1`
 - `templates/types/powershell-module/core/**` → `MyModule.psd1`, `MyModule.psm1`,
   `Public/.gitkeep`, `Private/.gitkeep`, `Tests/MyModule.Tests.ps1`, **`README.md`** *(overrides
   the base README — type wins)*

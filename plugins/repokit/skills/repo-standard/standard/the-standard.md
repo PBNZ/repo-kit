@@ -181,6 +181,20 @@ name-to-handle association is already public and the goal is *no new occurrences
 association itself is the secret, keep the pattern out of the tree (a repository secret works)
 and rely on the identity check plus review.
 
+**The shipped local guard.** Hand-rolled pre-commit guards fail silently — a field case: a GNU
+BRE quoting subtlety (`\+` as a quantifier) made a diff filter discard every line it was meant
+to scan, so the guard passed everything, including a staged test leak; only a deliberate
+negative test caught it. Core therefore ships `scripts/install-privacy-guard.ps1`: run it once
+per clone, and it prompts for the patterns locally (case-insensitive **literals**, not regexes)
+and writes an **untracked** hook into `.git/hooks/` that blocks staged additions, staged
+filenames, and a non-noreply commit identity — the patterns never touch the tree, while the
+installer itself stays clean and trackable. Every install ends with an automatic negative test
+in a throwaway fixture (a clean stage must pass; a synthetic content leak, filename leak, and
+real-name identity must each be blocked) and removes the hook again if any assertion fails: **a
+guard that has never failed a negative test is not yet a guard** (ADR-0012). The hook does not
+travel with clones — re-install per machine — and `git commit --no-verify` bypasses it, so the
+CI-side options above stay worthwhile.
+
 ## Promotion path
 
 Private → public → published just **switches on the next layer** over the *same* structure. Moving
