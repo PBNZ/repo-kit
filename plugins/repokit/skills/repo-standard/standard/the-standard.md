@@ -140,6 +140,11 @@ many of these names are read by tools that require an exact case.
 follow the language/ecosystem idiom; never rename a convention-bearing file just to make the tree
 look uniform.
 
+**Repo names:** `/new-repo` defaults to kebab-case, but a deliberate **branding name** (a
+camelCase product name, say) is an allowed exception — the user's choice of their own product
+name is not a style violation to argue with. Record the choice in ADR-0001 so an audit reads it
+as a decision.
+
 ## Author identity
 
 The **GitHub handle** (account or org login) identifies the author everywhere an
@@ -200,6 +205,13 @@ CI-side options above stay worthwhile.
 Private → public → published just **switches on the next layer** over the *same* structure. Moving
 a script from a private collection into a public collection repo is a **copy, not a rewrite**.
 
+**Early licence (opt-in).** When the public release is already planned at scaffold time,
+`/new-repo` offers to stamp `LICENSE` at Core — and `NOTICE` too, when third-party licensed
+material will be incorporated while still private, since its attribution belongs there from the
+moment the material arrives. The choice is recorded in ADR-0001; no START-HERE variance row is
+needed, because a licence stamped early on a promotion-planned repo *is* the promotion path
+("nothing to scrub at flip time"), not a deviation from the Core file set (ADR-0011).
+
 ## Variance declarations
 
 The standard tolerates variants by design — ceremony scales by tier, and a README-status
@@ -222,6 +234,12 @@ it locally before a release, or add one CI line:
   shell: pwsh
   run: ./scripts/repokit-check.ps1
 ```
+
+**Planned paths.** A map row may name layout the repo has not grown into yet (say, a monorepo's
+`firmware/` and `app/` components) — declaring intent is useful, and the standard says *not* to
+pre-create empty directories. Suffix the backticked token with `(planned)` —
+`` `firmware/` (planned) `` — and the self-check skips that token's existence assertion. The
+marker covers only the token it follows; remove it when the path becomes real.
 
 **Adoption marker — retro-adopted repos.** A repo that adopts the standard mid-life snaps to the
 conventions at the adoption commit; nothing before it should ever be re-flagged by an audit.

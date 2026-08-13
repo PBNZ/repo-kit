@@ -24,7 +24,9 @@ Two reference files (read them from the same base dir as you need them):
 
 Gather these from the user's arguments / message, else ask — keep it to load-bearing questions:
 
-- **name** — the repo / directory name (kebab-case).
+- **name** — the repo / directory name. Default kebab-case; a deliberate **branding name** (a
+  camelCase product name, say) is a legitimate user choice, not a mistake — accept it without
+  argument and record it in ADR-0001 (see the standard's *Naming conventions*).
 - **description** — one line.
 - **type** — one of: `powershell-module`, `docker-compose`, `power-platform-connectors`,
   `skill-plugin`, `collection`, `mcp-server`, `app-ts`, `app-python`, `script-collection`.
@@ -39,11 +41,38 @@ Gather these from the user's arguments / message, else ask — keep it to load-b
   operational state (deployed resources, scheduled jobs, long-running migrations)?"* If yes, the
   add-on stamps `docs/RUNBOOK.md`, `docs/STATE.json`, `scripts/check-docs.ps1`, and a `docs.yml`
   check workflow (see `references/living-docs-rules.md`).
+- **early licence** — *private repos only*, default **no**. Ask: *"Is a public release already
+  planned?"* If yes, stamp `LICENSE` now from the Public-tier template, and ask one follow-up:
+  *"Will third-party licensed material be incorporated while still private?"* — if so, also
+  stamp `NOTICE` (see `references/file-set-resolution.md`, *Early licence*). Record both answers
+  in ADR-0001. No START-HERE variance row — an early licence on a promotion-planned repo follows
+  the standard's *Promotion path*, it doesn't deviate from it.
 - For `powershell-module` only: **ModuleName** (PascalCase, e.g. `MyModule`).
 
 If the chosen type is a **stub** (anything other than `powershell-module`, `docker-compose`, or `power-platform-connectors`), tell the user so: the
 Core/Public/Published files get stamped, but there's no type-specific structure yet. Confirm they
 want to continue.
+
+## Adopting a directory that already has content
+
+The target directory may already contain files (a design doc written before repo genesis, a
+prototype script). That is supported — scaffold *around* the content instead of improvising:
+
+1. **Inventory first.** List the existing files. If the directory is already a git repo
+   (`.git/` present), stop — that is a retrofit, not a scaffold: apply the standard by hand
+   and add the adoption marker (see the standard, *Variance declarations*).
+2. **Collision rule: pre-existing content wins.** Intersect the resolved file set (step 1
+   below) with what is on disk. Never overwrite a pre-existing file with a template — skip
+   each colliding template, list the collisions in the final summary, and leave merging
+   template content into the user's file (say, folding the README boilerplate into their
+   existing README) as a follow-up the user approves.
+3. **Two commits, pre-existing first** — this replaces step 5's single stage+commit: stage
+   and commit the pre-existing files as-is (`chore: import pre-existing content`), then stage
+   the stamped files and make the scaffold commit on top. The scaffold commit stays a pure,
+   reviewable RepoKit diff, and history records honestly that the content predates the
+   scaffold.
+4. **Record it in ADR-0001:** the repo was scaffolded into a pre-populated directory, plus the
+   collision list, if any.
 
 ## Steps
 

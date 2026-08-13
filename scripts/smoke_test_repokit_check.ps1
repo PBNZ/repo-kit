@@ -6,7 +6,9 @@
 # FAILS on each drift case from the retrospective (refs #16): missing shim, non-importing shim,
 # broken START-HERE path, missing changelog, missing ADR dir, missing resume-state row — plus
 # the author-identity cases (refs #25/#26): handle + noreply passes, a real name or personal
-# email fails, and a declared variance row switches the check off.
+# email fails, and a declared variance row switches the check off — plus the "(planned)"
+# marker cases (refs #31): a planned path needn't exist, and the marker covers only the token
+# it follows.
 
 $ErrorActionPreference = 'Stop'
 
@@ -112,6 +114,20 @@ Assert-Check 'declared author-identity variance passes' $d 0
 #     name paired with the web-flow email must not slip through.
 Assert-Check 'web-flow identity passes' (New-GitFixture 'GitHub' 'noreply@github.com') 0
 Assert-Check 'real name on the web-flow email fails' (New-GitFixture 'Octo Cat' 'noreply@github.com') 1
+
+# --- "(planned)" marker cases (refs #31) -----------------------------------------------------
+
+# 14. A row may declare planned-but-not-yet-created paths — the standard says not to pre-create
+#     empty directories, so the marker skips the existence assertion.
+$d = New-Fixture
+Add-Content (Join-Path $d 'AGENTS.md') '| Planned component layout | `firmware/` (planned), `app/` (planned) |'
+Assert-Check 'planned paths pass without existing' $d 0
+
+# 15. The marker covers only the token it follows — an unmarked broken path in the same row
+#     still fails.
+$d = New-Fixture
+Add-Content (Join-Path $d 'AGENTS.md') '| Mixed row | `missing/dir` and `future/dir` (planned) |'
+Assert-Check 'unmarked broken path beside a planned one still fails' $d 1
 
 if ($script:failed -gt 0) { Write-Host "smoke_test_repokit_check: $script:failed failure(s)"; exit 1 }
 Write-Host 'smoke_test_repokit_check: all cases passed'

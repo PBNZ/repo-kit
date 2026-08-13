@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `/new-repo` offers an **early-licence opt-in** to promotion-planned private repos (#32,
+  ADR-0011): answer yes to "is a public release already planned?" and `LICENSE` is stamped at
+  Core from the Public-tier template — plus a minimal `NOTICE` when third-party licensed
+  material is expected while still private. Recorded in ADR-0001, no variance row needed: the
+  standard's *Promotion path* now states an early licence is the promotion path, not a
+  deviation. Default stays no; forever-private repos keep zero ceremony.
 - Core ships a **tested privacy-guard pre-commit hook** (#34, ADR-0012):
   `scripts/install-privacy-guard.ps1` writes an untracked `.git/hooks/` guard that blocks
   staged additions, staged filenames, and non-noreply commit identities matching
@@ -18,6 +24,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Documented in the standard's *Author identity* and the pre-commit checklist ("a guard that
   has never failed a negative test is not yet a guard"); CI smoke-tests the template
   end-to-end through real `git commit` runs.
+
+### Fixed
+
+- `repokit-check.ps1` no longer fails START-HERE rows that declare planned-but-not-yet-created
+  paths (#31, ADR-0010): a backticked token suffixed `(planned)` skips the existence assertion
+  — the standard prescribes not pre-creating empty directories — while the marker covers only
+  the token it follows, so an unmarked broken path in the same row still fails. Documented in
+  the standard's *Variance declarations* (*Planned paths*) and covered by two smoke cases.
+- Two `/new-repo` documentation gaps observed in a scaffolding session (#33): the skill now
+  documents **adopting a directory that already has content** (inventory first, pre-existing
+  content wins collisions, two commits with the import before the scaffold, recorded in
+  ADR-0001), and the naming conventions state that a deliberate **branding name** is an
+  allowed exception to the kebab-case default — the user's own product name is accepted and
+  recorded in ADR-0001, not argued with.
 
 ## [0.6.0] - 2026-08-13
 
